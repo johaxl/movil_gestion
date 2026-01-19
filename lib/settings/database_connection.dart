@@ -51,7 +51,7 @@ class DatabaseConnection {
               isbn TEXT UNIQUE,
               anio_publicacion INTEGER,
               id_autor INTEGER,
-              estado TEXT,
+              editorial TEXT,
               FOREIGN KEY (id_autor) REFERENCES autores(id_autor)
           )
       ''');

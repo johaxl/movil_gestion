@@ -4,7 +4,7 @@ class LibrosModels {
   String isbn;
   int anioPublicacion;
   int idAutor;
-  String estado;
+  String editorial;
 
   LibrosModels({
     this.id,
@@ -12,7 +12,7 @@ class LibrosModels {
     required this.isbn,
     required this.anioPublicacion,
     required this.idAutor,
-    required this.estado,
+    required this.editorial,
   });
 
   factory LibrosModels.fromMap(Map<String, dynamic> data) {
@@ -22,7 +22,7 @@ class LibrosModels {
       isbn: data['isbn'],
       anioPublicacion: data['anio_publicacion'],
       idAutor: data['id_autor'],
-      estado: data['estado'],
+      editorial: data['editorial'],
     );
   }
 
@@ -33,7 +33,7 @@ class LibrosModels {
       'isbn': isbn,
       'anio_publicacion': anioPublicacion,
       'id_autor': idAutor,
-      'estado': estado,
+      'editorial': editorial,
     };
   }
 }

@@ -17,7 +17,7 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
   final isbnController = TextEditingController();
   final idAutorController = TextEditingController();
   final anioController = TextEditingController();
-  final estadoController = TextEditingController();
+  final editorialController = TextEditingController();
 
   LibrosModels? libro;
 
@@ -31,7 +31,7 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
       isbnController.text = libro!.isbn;
       idAutorController.text = libro!.idAutor.toString();
       anioController.text = libro!.anioPublicacion.toString();
-      estadoController.text = libro!.estado;
+      editorialController.text = libro!.editorial;
     }
   }
 
@@ -42,7 +42,7 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(esEditar ? "Editar Libro" : "Insertar Libro"),
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color.fromARGB(255, 107, 197, 180),
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
@@ -58,6 +58,11 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                     value == null || value.isEmpty ? "Campo requerido" : null,
                 decoration: InputDecoration(
                   labelText: "Título",
+                  hintText: "Ingrese el título del libro",
+                  prefixIcon: Icon(
+                    Icons.qr_code,
+                    color: const Color.fromARGB(255, 107, 197, 180),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
@@ -71,6 +76,11 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                     value == null || value.isEmpty ? "Campo requerido" : null,
                 decoration: InputDecoration(
                   labelText: "ISBN",
+                  hintText: "Ingrese el ISBN del libro",
+                  prefixIcon: Icon(
+                    Icons.qr_code,
+                    color: const Color.fromARGB(255, 107, 197, 180),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
@@ -84,6 +94,11 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                     value == null || value.isEmpty ? "Campo requerido" : null,
                 decoration: InputDecoration(
                   labelText: "ID Autor",
+                  hintText: "Seleccione el nombre del autor",
+                  prefixIcon: Icon(
+                    Icons.qr_code,
+                    color: const Color.fromARGB(255, 107, 197, 180),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
@@ -97,6 +112,11 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                     value == null || value.isEmpty ? "Campo requerido" : null,
                 decoration: InputDecoration(
                   labelText: "Año Publicación",
+                  hintText: "Ingrese el año de publicación",
+                  prefixIcon: Icon(
+                    Icons.qr_code,
+                    color: const Color.fromARGB(255, 107, 197, 180),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
@@ -105,11 +125,16 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
               SizedBox(height: 10),
 
               TextFormField(
-                controller: estadoController,
+                controller: editorialController,
                 validator: (value) =>
                     value == null || value.isEmpty ? "Campo requerido" : null,
                 decoration: InputDecoration(
-                  labelText: "Estado",
+                  labelText: "Editorial",
+                  hintText: "Ingrese el nombre de la editorial",
+                  prefixIcon: Icon(
+                    Icons.qr_code,
+                    color: const Color.fromARGB(255, 107, 197, 180),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
@@ -130,7 +155,7 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                             isbn: isbnController.text,
                             idAutor: int.parse(idAutorController.text),
                             anioPublicacion: int.parse(anioController.text),
-                            estado: estadoController.text,
+                            editorial: editorialController.text,
                           );
 
                           if (esEditar) {
