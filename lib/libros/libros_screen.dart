@@ -43,11 +43,25 @@ class _LibroScreenState extends State<LibroScreen> {
         actions: [
           TextButton(
             onPressed: () async {
-              // elimina el libro
-              await repo.delete(id);
+              // intenta eliminar
+              final result = await repo.delete(id);
+
               // cierra el diálogo
               Navigator.pop(context);
-              // recarga la lista
+
+              // si está relacionado, no se elimina
+              if (result == -1) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      "No se puede eliminar el libro porque tiene préstamos",
+                    ),
+                  ),
+                );
+                return;
+              }
+
+              // recarga la lista si se eliminó
               cargarLibros();
             },
             child: const Text("SI"),
@@ -75,12 +89,9 @@ class _LibroScreenState extends State<LibroScreen> {
 
       // cuerpo de la pantalla
       body: cargando
-          // muestra cargando
           ? const Center(child: CircularProgressIndicator())
-          // mensaje si no hay datos
           : libros.isEmpty
           ? const Center(child: Text("No hay libros registrados"))
-          // lista de libros
           : ListView.builder(
               itemCount: libros.length,
               itemBuilder: (context, i) {
@@ -88,13 +99,15 @@ class _LibroScreenState extends State<LibroScreen> {
 
                 return Card(
                   child: ListTile(
-                    // icono del libro
-                    leading: const Icon(Icons.book, color: Colors.blue),
+                    leading: const Icon(
+                      Icons.book,
+                      color: Color.fromARGB(255, 107, 197, 180),
+                    ),
 
-                    // muestra el título del libro
+                    // título del libro
                     title: Text(libro.titulo),
 
-                    // muestra el autor y el isbn
+                    // autor e isbn
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -103,25 +116,22 @@ class _LibroScreenState extends State<LibroScreen> {
                       ],
                     ),
 
-                    // botones de editar y eliminar
+                    // botones
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          // abre el formulario para editar
                           onPressed: () async {
                             await Navigator.pushNamed(
                               context,
                               '/libro/form',
                               arguments: libro,
                             );
-                            // recarga la lista
                             cargarLibros();
                           },
                           icon: const Icon(Icons.edit, color: Colors.orange),
                         ),
                         IconButton(
-                          // elimina el libro
                           onPressed: () => eliminarLibro(libro.id!),
                           icon: const Icon(Icons.delete, color: Colors.red),
                         ),
@@ -139,7 +149,7 @@ class _LibroScreenState extends State<LibroScreen> {
           cargarLibros();
         },
         child: const Icon(Icons.add, color: Colors.white),
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color.fromARGB(255, 107, 197, 180),
       ),
     );
   }

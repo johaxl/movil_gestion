@@ -22,9 +22,32 @@ class LibrosRepository {
     );
   }
 
-  // eliminar libro
+  // valida si el libro tiene relación con préstamos
+  Future<bool> tieneRelacion(int libroId) async {
+    final db = await database.db;
+
+    final response = await db.query(
+      'prestamos',
+      where: 'id_libro = ?',
+      whereArgs: [libroId],
+      limit: 1,
+    );
+
+    return response.isNotEmpty;
+  }
+
+  // eliminar libro SOLO si no tiene relación
   Future<int> delete(int id) async {
     final db = await database.db;
+
+    // valida relación
+    final relacionado = await tieneRelacion(id);
+
+    if (relacionado) {
+      // no permite eliminar
+      return -1;
+    }
+
     return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
 
@@ -32,7 +55,6 @@ class LibrosRepository {
   Future<List<LibrosModels>> getAll() async {
     final db = await database.db;
 
-    // consulta con relacion libros - autores
     final response = await db.rawQuery('''
       SELECT 
         l.id,
@@ -46,7 +68,6 @@ class LibrosRepository {
       INNER JOIN autores a ON a.id = l.id_autor
     ''');
 
-    // convierte los datos a modelo
     return response.map((e) => LibrosModels.fromMap(e)).toList();
   }
 }
