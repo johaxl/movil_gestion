@@ -11,9 +11,13 @@ class UsuarioScreen extends StatefulWidget {
 }
 
 class _UsuarioScreenState extends State<UsuarioScreen> {
+  // repositorio de usuarios
   final UsuariosRepository repo = UsuariosRepository();
 
+  // lista de usuarios
   List<UsuariosModels> usuarios = [];
+
+  // controla la carga
   bool cargando = true;
 
   @override
@@ -22,30 +26,49 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
     cargarUsuarios();
   }
 
+  // carga los usuarios
   Future<void> cargarUsuarios() async {
     setState(() => cargando = true);
     usuarios = await repo.getAll();
     setState(() => cargando = false);
   }
 
+  // intenta eliminar un usuario
   void eliminarUsuario(int id) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text("Eliminar Usuario"),
-        content: Text("¿Eliminar usuario?"),
+        title: const Text("Eliminar Usuario"),
+        content: const Text("¿Eliminar usuario?"),
         actions: [
           TextButton(
             onPressed: () async {
-              await repo.delete(id);
+              // intenta eliminar
+              final result = await repo.delete(id);
+
+              // cierra el diálogo
               Navigator.pop(context);
+
+              // si está relacionado, no se elimina
+              if (result == -1) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      "No se puede eliminar el usuario porque tiene préstamos",
+                    ),
+                  ),
+                );
+                return;
+              }
+
+              // recarga la lista si se eliminó
               cargarUsuarios();
             },
-            child: Text("SI"),
+            child: const Text("SI"),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("NO"),
+            child: const Text("NO"),
           ),
         ],
       ),
@@ -56,25 +79,41 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Listado de Usuarios"),
+        title: const Text("Listado de Usuarios"),
         backgroundColor: const Color.fromARGB(255, 145, 93, 17),
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
 
       body: cargando
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : usuarios.isEmpty
-          ? Center(child: Text("No hay usuarios registrados"))
+          ? const Center(child: Text("No hay usuarios registrados"))
           : ListView.builder(
               itemCount: usuarios.length,
               itemBuilder: (context, i) {
                 final user = usuarios[i];
+
                 return Card(
                   child: ListTile(
-                    leading: Icon(Icons.people, color: Colors.purple),
+                    leading: const Icon(
+                      Icons.person,
+                      color: Color.fromARGB(255, 145, 93, 17),
+                    ),
+
+                    // nombre completo
                     title: Text("${user.nombre} ${user.apellido}"),
-                    subtitle: Text(user.cedula),
+
+                    // cédula y correo
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Cédula: ${user.cedula}"),
+                        Text("Correo: ${user.correo}"),
+                      ],
+                    ),
+
+                    // botones
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -87,11 +126,11 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
                             );
                             cargarUsuarios();
                           },
-                          icon: Icon(Icons.edit, color: Colors.orange),
+                          icon: const Icon(Icons.edit, color: Colors.orange),
                         ),
                         IconButton(
                           onPressed: () => eliminarUsuario(user.id!),
-                          icon: Icon(Icons.delete, color: Colors.red),
+                          icon: const Icon(Icons.delete, color: Colors.red),
                         ),
                       ],
                     ),
@@ -105,7 +144,7 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
           await Navigator.pushNamed(context, '/usuario/form');
           cargarUsuarios();
         },
-        child: Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add, color: Colors.white),
         backgroundColor: const Color.fromARGB(255, 145, 93, 17),
       ),
     );

@@ -5,19 +5,15 @@ class UsuariosRepository {
   final tableName = "usuarios";
   final database = DatabaseConnection();
 
-  // Funcion para insertar datos
+  // insertar un usuario
   Future<int> create(UsuariosModels data) async {
-    // 1. llama a la funcion
     final db = await database.db;
-    // 2. ejecuta el sql
     return await db.insert(tableName, data.toMap());
   }
 
-  // funcion para editar datos
+  // editar un usuario
   Future<int> edit(UsuariosModels data) async {
-    // 1. llama a la funcion
     final db = await database.db;
-    // 2. ejecuta el sql
     return await db.update(
       tableName,
       data.toMap(),
@@ -26,21 +22,31 @@ class UsuariosRepository {
     );
   }
 
-  // Funcion para eliminar datos
+  // eliminar usuario solo si no está relacionado
   Future<int> delete(int id) async {
-    // 1. llama a la funcion
     final db = await database.db;
-    // 2. ejecuta el sql
+
+    // verificar si el usuario tiene registros relacionados en prestamos
+    final response = await db.rawQuery(
+      'SELECT COUNT(*) as total FROM prestamos WHERE id_usuario = ?',
+      [id],
+    );
+
+    final total = response.first['total'] as int;
+
+    // si tiene relación no se elimina
+    if (total > 0) {
+      return -1;
+    }
+
+    // eliminar si no tiene relación
     return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
 
-  // Funcion para listar datos
+  // listar todos los usuarios
   Future<List<UsuariosModels>> getAll() async {
-    // 1. llama a la funcion
     final db = await database.db;
-    // 2. ejecuta el sql
     final response = await db.query(tableName);
-    // 3. retorna y trasformar los datos de json a clase
     return response.map((e) => UsuariosModels.fromMap(e)).toList();
   }
 }
