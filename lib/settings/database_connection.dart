@@ -61,8 +61,8 @@ class DatabaseConnection {
               nombre TEXT NOT NULL,
               apellido TEXT NOT NULL,
               cedula TEXT UNIQUE,
-              telefono TEXT,
-              estado TEXT
+              telefono TEXT NOT NULL,
+              correo TEXT NOT NULL
             )
       ''');
         await db.execute('''

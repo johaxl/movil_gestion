@@ -57,7 +57,7 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Listado de Usuarios"),
-        backgroundColor: Colors.purple,
+        backgroundColor: const Color.fromARGB(255, 145, 93, 17),
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
@@ -106,7 +106,7 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
           cargarUsuarios();
         },
         child: Icon(Icons.add, color: Colors.white),
-        backgroundColor: Colors.purple,
+        backgroundColor: const Color.fromARGB(255, 145, 93, 17),
       ),
     );
   }

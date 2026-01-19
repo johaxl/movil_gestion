@@ -4,7 +4,7 @@ class UsuariosModels {
   String apellido;
   String cedula;
   String telefono;
-  String estado;
+  String correo;
 
   UsuariosModels({
     this.id,
@@ -12,7 +12,7 @@ class UsuariosModels {
     required this.apellido,
     required this.cedula,
     required this.telefono,
-    required this.estado,
+    required this.correo,
   });
 
   factory UsuariosModels.fromMap(Map<String, dynamic> data) {
@@ -22,7 +22,7 @@ class UsuariosModels {
       apellido: data['apellido'],
       cedula: data['cedula'],
       telefono: data['telefono'],
-      estado: data['estado'],
+      correo: data['correo'],
     );
   }
 
@@ -33,7 +33,7 @@ class UsuariosModels {
       'apellido': apellido,
       'cedula': cedula,
       'telefono': telefono,
-      'estado': estado,
+      'correo': correo,
     };
   }
 }
