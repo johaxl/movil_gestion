@@ -52,7 +52,7 @@ class DatabaseConnection {
               anio_publicacion INTEGER,
               id_autor INTEGER,
               editorial TEXT,
-              FOREIGN KEY (id_autor) REFERENCES autores(id_autor)
+              FOREIGN KEY (id_autor) REFERENCES autores(id)
           )
       ''');
         await db.execute('''

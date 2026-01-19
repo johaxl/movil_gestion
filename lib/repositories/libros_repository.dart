@@ -5,19 +5,15 @@ class LibrosRepository {
   final tableName = "libros";
   final database = DatabaseConnection();
 
-  // Funcion para insertar datos
+  // insertar libro
   Future<int> create(LibrosModels data) async {
-    // 1. llama a la funcion
     final db = await database.db;
-    // 2. ejecuta el sql
     return await db.insert(tableName, data.toMap());
   }
 
-  // funcion para editar datos
+  // editar libro
   Future<int> edit(LibrosModels data) async {
-    // 1. llama a la funcion
     final db = await database.db;
-    // 2. ejecuta el sql
     return await db.update(
       tableName,
       data.toMap(),
@@ -26,21 +22,31 @@ class LibrosRepository {
     );
   }
 
-  // Funcion para eliminar datos
+  // eliminar libro
   Future<int> delete(int id) async {
-    // 1. llama a la funcion
     final db = await database.db;
-    // 2. ejecuta el sql
     return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
 
-  // Funcion para listar datos
+  // listar libros con nombre del autor
   Future<List<LibrosModels>> getAll() async {
-    // 1. llama a la funcion
     final db = await database.db;
-    // 2. ejecuta el sql
-    final response = await db.query(tableName);
-    // 3. retorna y trasformar los datos de json a clase
+
+    // consulta con relacion libros - autores
+    final response = await db.rawQuery('''
+      SELECT 
+        l.id,
+        l.titulo,
+        l.isbn,
+        l.id_autor,
+        l.anio_publicacion,
+        l.editorial,
+        a.nombre || ' ' || a.apellido AS autor_nombre
+      FROM libros l
+      INNER JOIN autores a ON a.id = l.id_autor
+    ''');
+
+    // convierte los datos a modelo
     return response.map((e) => LibrosModels.fromMap(e)).toList();
   }
 }

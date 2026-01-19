@@ -6,6 +6,9 @@ class LibrosModels {
   int idAutor;
   String editorial;
 
+  // nombre del autor (solo lectura)
+  String? autorNombre;
+
   LibrosModels({
     this.id,
     required this.titulo,
@@ -13,6 +16,7 @@ class LibrosModels {
     required this.anioPublicacion,
     required this.idAutor,
     required this.editorial,
+    this.autorNombre,
   });
 
   factory LibrosModels.fromMap(Map<String, dynamic> data) {
@@ -23,6 +27,7 @@ class LibrosModels {
       anioPublicacion: data['anio_publicacion'],
       idAutor: data['id_autor'],
       editorial: data['editorial'],
+      autorNombre: data['autor_nombre'],
     );
   }
 

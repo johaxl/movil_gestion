@@ -116,7 +116,9 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
 
                 // autor relacionado
                 DropdownButtonFormField<String>(
-                  value: idAutorController.text.isEmpty
+                  value: autores.isEmpty
+                      ? null
+                      : idAutorController.text.isEmpty
                       ? null
                       : idAutorController.text,
                   validator: (value) =>
@@ -149,21 +151,16 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                   controller: anioController,
                   keyboardType: TextInputType.number,
                   validator: (value) {
-                    // valida campo vacío
                     if (value == null || value.isEmpty) {
                       return "Campo requerido";
                     }
 
-                    // valida que sea número
                     final anio = int.tryParse(value);
                     if (anio == null) {
                       return "Solo números";
                     }
 
-                    // obtiene el año actual
                     final anioActual = DateTime.now().year;
-
-                    // valida que no sea mayor al año actual
                     if (anio > anioActual) {
                       return "No puede ser mayor al año actual";
                     }
