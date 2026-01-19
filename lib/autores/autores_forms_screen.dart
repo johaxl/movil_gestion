@@ -75,7 +75,9 @@ class _AutorFormScreenState extends State<AutorFormScreen> {
                   validator: (value) =>
                       value == null || value.isEmpty ? "Campo requerido" : null,
                   decoration: InputDecoration(
-                    labelText: "Nombre",
+                    labelText: "Nombre del Autor",
+                    hintText: "Ingrese el nombre del autor",
+                    prefixIcon: Icon(Icons.person),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -90,7 +92,9 @@ class _AutorFormScreenState extends State<AutorFormScreen> {
                   validator: (value) =>
                       value == null || value.isEmpty ? "Campo requerido" : null,
                   decoration: InputDecoration(
-                    labelText: "Apellido",
+                    labelText: "Apellido del Autor",
+                    hintText: "Ingrese el apellido del autor",
+                    prefixIcon: Icon(Icons.person_outline),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -105,7 +109,9 @@ class _AutorFormScreenState extends State<AutorFormScreen> {
                   validator: (value) =>
                       value == null || value.isEmpty ? "Campo requerido" : null,
                   decoration: InputDecoration(
-                    labelText: "Nacionalidad",
+                    labelText: "Nacionalidad del Autor",
+                    hintText: "Ingrese la nacionalidad del autor",
+                    prefixIcon: Icon(Icons.flag),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -121,7 +127,9 @@ class _AutorFormScreenState extends State<AutorFormScreen> {
                   validator: (value) =>
                       value == null || value.isEmpty ? "Campo requerido" : null,
                   decoration: InputDecoration(
-                    labelText: "Fecha de Nacimiento",
+                    labelText: "Fecha de Nacimiento del Autor",
+                    hintText: "Ingrese la fecha de nacimiento",
+                    prefixIcon: Icon(Icons.calendar_month),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -170,7 +178,9 @@ class _AutorFormScreenState extends State<AutorFormScreen> {
                   validator: (value) =>
                       value == null || value.isEmpty ? "Campo requerido" : null,
                   decoration: InputDecoration(
-                    labelText: "Género Literario",
+                    labelText: "Género Literario que escribió el Autor",
+                    hintText: "Ingrese el género literario",
+                    prefixIcon: Icon(Icons.menu_book),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),

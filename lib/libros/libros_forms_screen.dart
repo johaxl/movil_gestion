@@ -141,7 +141,7 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
 
                 const SizedBox(height: 10),
 
-                // año de publicación solo números
+                // año de publicación
                 TextFormField(
                   controller: anioController,
                   keyboardType: TextInputType.number,
