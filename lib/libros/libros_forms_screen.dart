@@ -87,6 +87,7 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                       value == null || value.isEmpty ? "Campo requerido" : null,
                   decoration: InputDecoration(
                     labelText: "Título",
+                    hintText: "Ingrese el título del libro",
                     prefixIcon: const Icon(Icons.book),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -103,6 +104,7 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                       value == null || value.isEmpty ? "Campo requerido" : null,
                   decoration: InputDecoration(
                     labelText: "ISBN",
+                    hintText: "Ingrese el ISBN del libro",
                     prefixIcon: const Icon(Icons.qr_code),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -121,6 +123,7 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                       value == null || value.isEmpty ? "Campo requerido" : null,
                   decoration: InputDecoration(
                     labelText: "Autor",
+                    hintText: "Seleccione el autor del libro",
                     prefixIcon: const Icon(Icons.person),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -146,16 +149,30 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                   controller: anioController,
                   keyboardType: TextInputType.number,
                   validator: (value) {
+                    // valida campo vacío
                     if (value == null || value.isEmpty) {
                       return "Campo requerido";
                     }
-                    if (int.tryParse(value) == null) {
+
+                    // valida que sea número
+                    final anio = int.tryParse(value);
+                    if (anio == null) {
                       return "Solo números";
                     }
+
+                    // obtiene el año actual
+                    final anioActual = DateTime.now().year;
+
+                    // valida que no sea mayor al año actual
+                    if (anio > anioActual) {
+                      return "No puede ser mayor al año actual";
+                    }
+
                     return null;
                   },
                   decoration: InputDecoration(
                     labelText: "Año de Publicación",
+                    hintText: "Ingrese el año de publicación",
                     prefixIcon: const Icon(Icons.calendar_today),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -172,6 +189,7 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                       value == null || value.isEmpty ? "Campo requerido" : null,
                   decoration: InputDecoration(
                     labelText: "Editorial",
+                    hintText: "Ingrese la editorial del libro",
                     prefixIcon: const Icon(Icons.business),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),

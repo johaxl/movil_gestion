@@ -7,17 +7,17 @@ class AutoresRepository {
 
   // Funcion para insertar datos
   Future<int> create(AutoresModels data) async {
-    // 1. llama a la funcion
+    // Llama a la base de datos
     final db = await database.db;
-    // 2. ejecuta el sql
+    // Inserta el autor
     return await db.insert(tableName, data.toMap());
   }
 
-  // funcion para editar datos
+  // Funcion para editar datos
   Future<int> edit(AutoresModels data) async {
-    // 1. llama a la funcion
+    // Llama a la base de datos
     final db = await database.db;
-    // 2. ejecuta el sql
+    // Actualiza el autor por id
     return await db.update(
       tableName,
       data.toMap(),
@@ -28,19 +28,36 @@ class AutoresRepository {
 
   // Funcion para eliminar datos
   Future<int> delete(int id) async {
-    // 1. llama a la funcion
+    // Llama a la base de datos
     final db = await database.db;
-    // 2. ejecuta el sql
+    // Elimina el autor por id
     return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
 
   // Funcion para listar datos
   Future<List<AutoresModels>> getAll() async {
-    // 1. llama a la funcion
+    // Llama a la base de datos
     final db = await database.db;
-    // 2. ejecuta el sql
+    // Consulta todos los autores
     final response = await db.query(tableName);
-    // 3. retorna y trasformar los datos de json a clase
+    // Convierte los datos a lista de objetos
     return response.map((e) => AutoresModels.fromMap(e)).toList();
+  }
+
+  // Funcion para validar si el autor tiene relacion con libros
+  Future<bool> tieneRelacion(int autorId) async {
+    // Llama a la base de datos
+    final db = await database.db;
+
+    // Consulta si existe al menos un libro con este autor
+    final response = await db.query(
+      'libros',
+      where: 'id_autor = ?',
+      whereArgs: [autorId],
+      limit: 1,
+    );
+
+    // Retorna true si hay relacion
+    return response.isNotEmpty;
   }
 }

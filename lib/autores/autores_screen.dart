@@ -10,9 +10,13 @@ class AutorScreen extends StatefulWidget {
 }
 
 class _AutorScreenState extends State<AutorScreen> {
+  // Instancia del repositorio de autores
   final AutoresRepository repo = AutoresRepository();
 
+  // Lista donde se guardan los autores
   List<AutoresModels> autores = [];
+
+  // Controla el estado de carga
   bool cargando = true;
 
   @override
@@ -21,13 +25,39 @@ class _AutorScreenState extends State<AutorScreen> {
     cargarAutores();
   }
 
+  // Obtiene todos los autores desde la base de datos
   Future<void> cargarAutores() async {
     setState(() => cargando = true);
     autores = await repo.getAll();
     setState(() => cargando = false);
   }
 
-  void eliminarAutor(int id) {
+  // Valida si el autor tiene relación antes de eliminar
+  Future<void> eliminarAutor(int id) async {
+    // Verifica si el autor está relacionado
+    final tieneRelacion = await repo.tieneRelacion(id);
+
+    // Si tiene relación, no permite eliminar
+    if (tieneRelacion) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text("No se puede eliminar"),
+          content: Text(
+            "Este autor tiene registros relacionados y no puede eliminarse",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Aceptar"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // Si no tiene relación, pide confirmación
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -61,6 +91,7 @@ class _AutorScreenState extends State<AutorScreen> {
         centerTitle: true,
       ),
 
+      // Muestra un cargador mientras se obtienen los datos
       body: cargando
           ? Center(child: CircularProgressIndicator())
           : autores.isEmpty
@@ -69,13 +100,18 @@ class _AutorScreenState extends State<AutorScreen> {
               itemCount: autores.length,
               itemBuilder: (context, i) {
                 final autor = autores[i];
+
                 return Card(
                   child: ListTile(
                     leading: Icon(
                       Icons.person,
                       color: const Color.fromARGB(255, 74, 144, 226),
                     ),
+
+                    // Nombre completo del autor
                     title: Text("${autor.nombre} ${autor.apellido}"),
+
+                    // Información adicional del autor
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -87,6 +123,7 @@ class _AutorScreenState extends State<AutorScreen> {
                       ],
                     ),
 
+                    // Botones de editar y eliminar
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -112,6 +149,7 @@ class _AutorScreenState extends State<AutorScreen> {
               },
             ),
 
+      // Botón para agregar un nuevo autor
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.pushNamed(context, '/autor/form');
