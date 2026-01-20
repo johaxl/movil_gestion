@@ -5,19 +5,13 @@ class PrestamosRepository {
   final tableName = "prestamos";
   final database = DatabaseConnection();
 
-  // Funcion para insertar datos
   Future<int> create(PrestamosModels data) async {
-    // 1. llama a la funcion
     final db = await database.db;
-    // 2. ejecuta el sql
     return await db.insert(tableName, data.toMap());
   }
 
-  // funcion para editar datos
   Future<int> edit(PrestamosModels data) async {
-    // 1. llama a la funcion
     final db = await database.db;
-    // 2. ejecuta el sql
     return await db.update(
       tableName,
       data.toMap(),
@@ -26,21 +20,79 @@ class PrestamosRepository {
     );
   }
 
-  // Funcion para eliminar datos
   Future<int> delete(int id) async {
-    // 1. llama a la funcion
     final db = await database.db;
-    // 2. ejecuta el sql
     return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
 
-  // Funcion para listar datos
+  // Listado con nombres de libro y usuario
   Future<List<PrestamosModels>> getAll() async {
-    // 1. llama a la funcion
     final db = await database.db;
-    // 2. ejecuta el sql
-    final response = await db.query(tableName);
-    // 3. retorna y trasformar los datos de json a clase
+
+    final response = await db.rawQuery('''
+      SELECT
+        p.id,
+        p.id_libro,
+        p.id_usuario,
+        p.fecha_prestamo,
+        p.fecha_devolucion,
+        p.estado,
+        l.titulo AS libro_nombre,
+        u.nombre || ' ' || u.apellido AS usuario_nombre
+      FROM prestamos p
+      INNER JOIN libros l ON l.id = p.id_libro
+      INNER JOIN usuarios u ON u.id = p.id_usuario
+      ORDER BY p.id DESC
+    ''');
+
     return response.map((e) => PrestamosModels.fromMap(e)).toList();
+  }
+
+  Future<bool> libroOcupado(int idLibro) async {
+    final db = await database.db;
+
+    final result = await db.rawQuery(
+      '''
+      SELECT COUNT(*) total
+      FROM prestamos
+      WHERE id_libro = ?
+      AND estado IN ('ACTIVO', 'ATRASADO')
+      ''',
+      [idLibro],
+    );
+
+    return (result.first['total'] as int) > 0;
+  }
+
+  Future<bool> usuarioConDosLibros(int idUsuario) async {
+    final db = await database.db;
+
+    final result = await db.rawQuery(
+      '''
+      SELECT COUNT(*) total
+      FROM prestamos
+      WHERE id_usuario = ?
+      AND estado IN ('ACTIVO', 'ATRASADO')
+      ''',
+      [idUsuario],
+    );
+
+    return (result.first['total'] as int) >= 2;
+  }
+
+  Future<void> actualizarAtrasados() async {
+    final db = await database.db;
+
+    final hoy = DateTime.now().toIso8601String().substring(0, 10);
+
+    await db.rawUpdate(
+      '''
+      UPDATE prestamos
+      SET estado = 'ATRASADO'
+      WHERE estado = 'ACTIVO'
+      AND fecha_devolucion < ?
+      ''',
+      [hoy],
+    );
   }
 }

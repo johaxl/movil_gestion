@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../models/prestamos_models.dart';
 import '../repositories/prestamos_repository.dart';
 
@@ -24,16 +23,53 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
 
   Future<void> cargarPrestamos() async {
     setState(() => cargando = true);
+
+    // actualizar automáticamente ATRASADO
+    await repo.actualizarAtrasados();
+
     prestamos = await repo.getAll();
     setState(() => cargando = false);
+  }
+
+  int calcularDiasAtraso(PrestamosModels p) {
+    if (p.estado != "ATRASADO") return 0;
+    final hoy = DateTime.now();
+    final fechaDev = DateTime.parse(p.fechaDevolucion);
+    return hoy.difference(fechaDev).inDays;
+  }
+
+  Color colorEstado(String estado) {
+    switch (estado) {
+      case "ACTIVO":
+        return Colors.green;
+      case "DEVUELTO":
+        return Colors.blue;
+      case "ATRASADO":
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  IconData iconoEstado(String estado) {
+    switch (estado) {
+      case "ACTIVO":
+        return Icons.schedule;
+      case "DEVUELTO":
+        return Icons.check_circle;
+      case "ATRASADO":
+        return Icons.warning;
+      default:
+        return Icons.info;
+    }
   }
 
   void eliminarPrestamo(int id) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text("Eliminar Préstamo"),
-        content: Text("¿Eliminar el préstamo?"),
+        title: const Text("Eliminar Préstamo"),
+        content: const Text("¿Eliminar el préstamo?"),
         actions: [
           TextButton(
             onPressed: () async {
@@ -41,56 +77,100 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
               Navigator.pop(context);
               cargarPrestamos();
             },
-            child: Text("SI"),
+            child: const Text("SI"),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("NO"),
+            child: const Text("NO"),
           ),
         ],
       ),
     );
   }
 
+  void editarPrestamo(PrestamosModels p) async {
+    await Navigator.pushNamed(context, '/prestamo/form', arguments: p);
+    cargarPrestamos();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Listado de Préstamos"),
+        title: const Text("Listado de Préstamos"),
         backgroundColor: Colors.red.shade700,
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
-
       body: cargando
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : prestamos.isEmpty
-          ? Center(child: Text("No hay préstamos registrados"))
+          ? const Center(child: Text("No hay préstamos registrados"))
           : ListView.builder(
               itemCount: prestamos.length,
               itemBuilder: (context, i) {
                 final p = prestamos[i];
+                final diasAtraso = calcularDiasAtraso(p);
+
                 return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   child: ListTile(
-                    leading: Icon(Icons.assignment, color: Colors.red),
-                    title: Text("Libro ID: ${p.idLibro}"),
-                    subtitle: Text("Usuario ID: ${p.idUsuario}"),
-                    trailing: IconButton(
-                      onPressed: () => eliminarPrestamo(p.id!),
-                      icon: Icon(Icons.delete, color: Colors.red),
+                    leading: Icon(
+                      iconoEstado(p.estado),
+                      color: colorEstado(p.estado),
+                    ),
+                    title: Text(
+                      "${p.libroNombre ?? "Libro"}  |  ${p.usuarioNombre ?? "Usuario"}",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Préstamo: ${p.fechaPrestamo}"),
+                        Text("Devolución: ${p.fechaDevolucion}"),
+                        Text(
+                          "Estado: ${p.estado}",
+                          style: TextStyle(
+                            color: colorEstado(p.estado),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (p.estado == "ATRASADO")
+                          Text(
+                            "Días de atraso: $diasAtraso",
+                            style: const TextStyle(
+                              color: Color.fromARGB(255, 90, 84, 83),
+                            ),
+                          ),
+                      ],
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.orange),
+                          onPressed: () => editarPrestamo(p),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => eliminarPrestamo(p.id!),
+                        ),
+                      ],
                     ),
                   ),
                 );
               },
             ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.pushNamed(context, '/prestamo/form');
           cargarPrestamos();
         },
-        child: Icon(Icons.add, color: Colors.white),
         backgroundColor: Colors.red.shade700,
+        child: const Icon(Icons.add),
       ),
     );
   }
