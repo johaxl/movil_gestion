@@ -1,107 +1,71 @@
 import 'package:flutter/material.dart';
-// importa flutter para usar widgets
-
 import 'package:flutter/services.dart';
-// importa herramientas para validar entradas
 
 import '../models/usuarios_models.dart';
-// importa el modelo de usuario
-
 import '../repositories/usuarios_repository.dart';
-// importa el repositorio de usuarios
 
 class UsuarioFormScreen extends StatefulWidget {
   const UsuarioFormScreen({super.key});
-  // crea la pantalla del formulario
 
   @override
   State<UsuarioFormScreen> createState() => _UsuarioFormScreenState();
-  // crea el estado de la pantalla
 }
 
 class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
-  // llave para validar el formulario
+  // key del formulario
   final formUsuario = GlobalKey<FormState>();
 
-  // controladores para leer los campos
+  // controllers
   final nombreController = TextEditingController();
   final apellidoController = TextEditingController();
   final cedulaController = TextEditingController();
   final telefonoController = TextEditingController();
   final correoController = TextEditingController();
 
-  // guarda el usuario si se edita
+  // usuario para editar
   UsuariosModels? usuario;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // se ejecuta cuando recibe datos
-
     final args = ModalRoute.of(context)!.settings.arguments;
-    // recibe datos de otra pantalla
 
-    // si hay datos es edicion
+    // si viene usuario, es edición
     if (args != null) {
       usuario = args as UsuariosModels;
-      // asigna el usuario
-
       nombreController.text = usuario!.nombre;
-      // llena el campo nombre
-
       apellidoController.text = usuario!.apellido;
-      // llena el campo apellido
-
       cedulaController.text = usuario!.cedula;
-      // llena el campo cedula
-
       telefonoController.text = usuario!.telefono;
-      // llena el campo telefono
-
       correoController.text = usuario!.correo;
-      // llena el campo correo
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final esEditar = usuario != null;
-    // verifica si es edicion
 
     return Scaffold(
       appBar: AppBar(
         title: Text(esEditar ? "Editar Usuario" : "Insertar Usuario"),
-
-        // muestra titulo segun accion
         backgroundColor: const Color.fromARGB(255, 145, 93, 17),
-
-        // color de la barra
         foregroundColor: Colors.white,
-
-        // color del texto
         centerTitle: true,
-        // centra el titulo
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
 
-        // margen interno
+        // scroll para evitar overflow
         child: SingleChildScrollView(
-          // permite hacer scroll
           child: Form(
             key: formUsuario,
-
-            // asigna la llave al formulario
             child: Column(
               children: [
+                // nombre
                 TextFormField(
                   controller: nombreController,
-
-                  // controla el campo nombre
                   validator: (value) =>
                       value == null || value.isEmpty ? "Campo requerido" : null,
-
-                  // valida que no este vacio
                   decoration: InputDecoration(
                     labelText: "Nombre del Usuario",
                     hintText: "Ingrese el nombre",
@@ -112,17 +76,13 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
                   ),
                 ),
 
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-                // espacio
+                // apellido
                 TextFormField(
                   controller: apellidoController,
-
-                  // controla el campo apellido
                   validator: (value) =>
                       value == null || value.isEmpty ? "Campo requerido" : null,
-
-                  // valida que no este vacio
                   decoration: InputDecoration(
                     labelText: "Apellido del Usuario",
                     hintText: "Ingrese el apellido",
@@ -133,52 +93,40 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
                   ),
                 ),
 
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-                // espacio
+                // cédula
                 TextFormField(
                   controller: cedulaController,
-
-                  // controla el campo cedula
                   keyboardType: TextInputType.number,
-
-                  // solo numeros
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
-
-                    // solo digitos
                     LengthLimitingTextInputFormatter(10),
-                    // maximo 10
                   ],
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Campo requerido";
                     }
                     if (value.length != 10) {
-                      return "La cedula debe tener 10 digitos";
+                      return "La cédula debe tener 10 dígitos";
                     }
                     return null;
                   },
                   decoration: InputDecoration(
-                    labelText: "Cedula del Usuario",
-                    hintText: "Ingrese la cedula",
+                    labelText: "Cédula del Usuario",
+                    hintText: "Ingrese la cédula (10 dígitos)",
                     prefixIcon: const Icon(Icons.badge),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
                   ),
                 ),
-
                 SizedBox(height: 10),
 
-                // espacio
+                // teléfono
                 TextFormField(
                   controller: telefonoController,
-
-                  // controla el campo telefono
                   keyboardType: TextInputType.number,
-
-                  // solo numeros
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(10),
@@ -188,13 +136,13 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
                       return "Campo requerido";
                     }
                     if (value.length != 10) {
-                      return "El telefono debe tener 10 digitos";
+                      return "El teléfono debe tener 10 dígitos";
                     }
                     return null;
                   },
                   decoration: InputDecoration(
-                    labelText: "Telefono del Usuario",
-                    hintText: "Ingrese el telefono",
+                    labelText: "Teléfono del Usuario",
+                    hintText: "Ingrese el teléfono (10 dígitos)",
                     prefixIcon: const Icon(Icons.phone),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -204,30 +152,25 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
 
                 SizedBox(height: 10),
 
-                // espacio
+                // correo electrónico validado
                 TextFormField(
                   controller: correoController,
-
-                  // controla el campo correo
                   keyboardType: TextInputType.emailAddress,
-
-                  // tipo correo
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Campo requerido";
                     }
 
+                    // validación básica de correo
                     final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                    // valida formato correo
-
                     if (!regex.hasMatch(value)) {
-                      return "Correo no valido";
+                      return "Correo no válido";
                     }
 
                     return null;
                   },
                   decoration: InputDecoration(
-                    labelText: "Correo Electronico",
+                    labelText: "Correo Electrónico",
                     hintText: "Ingrese el correo",
                     prefixIcon: const Icon(Icons.email),
                     border: OutlineInputBorder(
@@ -236,9 +179,9 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
                   ),
                 ),
 
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
 
-                // espacio
+                // botones
                 Row(
                   children: [
                     Expanded(
@@ -246,7 +189,6 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
                         onPressed: () async {
                           if (formUsuario.currentState!.validate()) {
                             final repo = UsuariosRepository();
-                            // crea el repositorio
 
                             final nuevo = UsuariosModels(
                               nombre: nombreController.text,
@@ -255,19 +197,15 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
                               telefono: telefonoController.text,
                               correo: correoController.text,
                             );
-                            // crea el objeto usuario
 
                             if (esEditar) {
                               nuevo.id = usuario!.id;
                               await repo.edit(nuevo);
-                              // actualiza usuario
                             } else {
                               await repo.create(nuevo);
-                              // guarda usuario
                             }
 
                             Navigator.pop(context);
-                            // regresa a la pantalla anterior
                           }
                         },
                         child: const Text("Aceptar"),
@@ -278,14 +216,11 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
                       ),
                     ),
 
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
 
-                    // espacio
                     Expanded(
                       child: TextButton(
                         onPressed: () => Navigator.pop(context),
-
-                        // cierra sin guardar
                         child: const Text("Cancelar"),
                         style: TextButton.styleFrom(
                           backgroundColor: Colors.red,

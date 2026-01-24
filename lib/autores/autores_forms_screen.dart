@@ -4,193 +4,269 @@ import '../repositories/autores_repository.dart';
 
 class AutorFormScreen extends StatefulWidget {
   const AutorFormScreen({super.key});
-  // constructor de la pantalla
 
   @override
   State<AutorFormScreen> createState() => _AutorFormScreenState();
-  // crea el estado de la pantalla
 }
 
 class _AutorFormScreenState extends State<AutorFormScreen> {
+  // key del formulario
   final formAutor = GlobalKey<FormState>();
-  // llave para validar el formulario
 
+  // controllers de los campos
   final nombreController = TextEditingController();
-  // controla el campo nombre
-
   final apellidoController = TextEditingController();
-  // controla el campo apellido
-
   final nacionalidadController = TextEditingController();
-  // controla el campo nacionalidad
-
   final fechaNacimientoController = TextEditingController();
-  // controla el campo fecha
-
   final generoLiterarioController = TextEditingController();
-  // controla el campo genero
 
+  // autor recibido para editar
   AutoresModels? autor;
-  // guarda el autor si se va a editar
 
+  // evita que se carguen los datos varias veces
   bool cargado = false;
-  // evita cargar datos varias veces
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // se ejecuta cuando recibe datos
 
+    // se ejecuta una sola vez
     if (!cargado) {
       final args = ModalRoute.of(context)!.settings.arguments;
-      // recibe datos de la pantalla anterior
 
+      // si viene un autor o es edición
       if (args != null) {
         autor = args as AutoresModels;
-        // convierte los datos en autor
 
+        // se cargan los datos en los campos
         nombreController.text = autor!.nombre;
-        // pone el nombre en el campo
-
         apellidoController.text = autor!.apellido;
-        // pone el apellido en el campo
-
         nacionalidadController.text = autor!.nacionalidad;
-        // pone la nacionalidad en el campo
-
         fechaNacimientoController.text = autor!.fechaNacimiento;
-        // pone la fecha en el campo
-
         generoLiterarioController.text = autor!.generoliterario;
-        // pone el genero en el campo
       }
 
       cargado = true;
-      // marca que ya cargo los datos
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // verifica si es edición o inserción
     final esEditar = autor != null;
-    // verifica si es editar o crear
 
     return Scaffold(
-      // estructura principal
       appBar: AppBar(
         title: Text(esEditar ? "Editar Autor" : "Insertar Autor"),
-        // titulo segun accion
+        backgroundColor: const Color.fromARGB(255, 74, 144, 226),
+        foregroundColor: Colors.white,
+        centerTitle: true,
       ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SingleChildScrollView(
+          child: Form(
+            key: formAutor,
+            child: Column(
+              children: [
+                // campo nombre
+                TextFormField(
+                  controller: nombreController,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Campo requerido" : null,
+                  decoration: InputDecoration(
+                    labelText: "Nombre del Autor",
+                    hintText: "Ingrese el nombre del autor",
+                    prefixIcon: Icon(Icons.person),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
 
-      body: Form(
-        key: formAutor,
+                const SizedBox(height: 10),
 
-        // formulario
-        child: Column(
-          children: [
-            TextFormField(
-              controller: nombreController,
+                // campo apellido
+                TextFormField(
+                  controller: apellidoController,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Campo requerido" : null,
+                  decoration: InputDecoration(
+                    labelText: "Apellido del Autor",
+                    hintText: "Ingrese el apellido del autor",
+                    prefixIcon: Icon(Icons.person_outline),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
 
-              // campo nombre
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Campo requerido" : null,
-              // valida que no este vacio
-            ),
+                const SizedBox(height: 10),
 
-            TextFormField(
-              controller: apellidoController,
-              // campo apellido
-            ),
+                // campo nacionalidad
+                TextFormField(
+                  controller: nacionalidadController,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Campo requerido" : null,
+                  decoration: InputDecoration(
+                    labelText: "Nacionalidad del Autor",
+                    hintText: "Ingrese la nacionalidad del autor",
+                    prefixIcon: Icon(Icons.flag),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
 
-            TextFormField(
-              controller: nacionalidadController,
-              // campo nacionalidad
-            ),
+                const SizedBox(height: 10),
 
-            TextFormField(
-              controller: fechaNacimientoController,
-              readOnly: true,
+                // campo fecha de nacimiento
+                TextFormField(
+                  controller: fechaNacimientoController,
+                  readOnly: true,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Campo requerido" : null,
+                  decoration: InputDecoration(
+                    labelText: "Fecha de Nacimiento del Autor",
+                    hintText: "Ingrese la fecha de nacimiento",
+                    prefixIcon: Icon(Icons.calendar_month),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  onTap: () async {
+                    // fecha inicial por defecto
+                    DateTime fechaInicial = DateTime(2000);
 
-              // solo permite seleccionar
-              onTap: () async {
-                // al tocar abre calendario
+                    // si ya hay fecha se va a usar esa
+                    if (fechaNacimientoController.text.isNotEmpty) {
+                      final partes = fechaNacimientoController.text.split('/');
+                      fechaInicial = DateTime(
+                        int.parse(partes[2]),
+                        int.parse(partes[1]),
+                        int.parse(partes[0]),
+                      );
+                    }
 
-                DateTime? fechaSeleccionada = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime(2000),
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime.now(),
-                );
-                // muestra selector de fecha
+                    // abre el selector de fecha
+                    DateTime? fechaSeleccionada = await showDatePicker(
+                      context: context,
+                      initialDate: fechaInicial,
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime.now(),
+                    );
 
-                if (fechaSeleccionada != null) {
-                  fechaNacimientoController.text =
-                      "${fechaSeleccionada.day}/${fechaSeleccionada.month}/${fechaSeleccionada.year}";
-                  // guarda la fecha seleccionada
-                }
-              },
-            ),
+                    // si selecciona una fecha se asigna
+                    if (fechaSeleccionada != null) {
+                      setState(() {
+                        fechaNacimientoController.text =
+                            "${fechaSeleccionada.day.toString().padLeft(2, '0')}/"
+                            "${fechaSeleccionada.month.toString().padLeft(2, '0')}/"
+                            "${fechaSeleccionada.year}";
+                      });
+                    }
+                  },
+                ),
 
-            DropdownButtonFormField<String>(
-              value: generoLiterarioController.text.isEmpty
-                  ? null
-                  : generoLiterarioController.text,
+                const SizedBox(height: 10),
 
-              // valor del menu
-              items: const [
-                DropdownMenuItem(value: "Novela", child: Text("Novela")),
-                DropdownMenuItem(value: "Poesia", child: Text("Poesia")),
-                DropdownMenuItem(value: "Historia", child: Text("Historia")),
+                // menú desplegable del género literario
+                DropdownButtonFormField<String>(
+                  value: generoLiterarioController.text.isEmpty
+                      ? null
+                      : generoLiterarioController.text,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Campo requerido" : null,
+                  decoration: InputDecoration(
+                    labelText: "Género Literario que escribió el Autor",
+                    hintText: "Ingrese el género literario",
+                    prefixIcon: Icon(Icons.menu_book),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: "Novela", child: Text("Novela")),
+                    DropdownMenuItem(value: "Poesía", child: Text("Poesía")),
+                    DropdownMenuItem(
+                      value: "Ciencia ficción",
+                      child: Text("Ciencia ficción"),
+                    ),
+                    DropdownMenuItem(
+                      value: "Historia",
+                      child: Text("Historia"),
+                    ),
+                    DropdownMenuItem(
+                      value: "Fantasía",
+                      child: Text("Fantasía"),
+                    ),
+                    DropdownMenuItem(value: "Ensayo", child: Text("Ensayo")),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      generoLiterarioController.text = value!;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 15),
+
+                // botones
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () async {
+                          // valida el formulario
+                          if (formAutor.currentState!.validate()) {
+                            final repo = AutoresRepository();
+
+                            // crea el objeto autor
+                            final nuevo = AutoresModels(
+                              nombre: nombreController.text,
+                              apellido: apellidoController.text,
+                              nacionalidad: nacionalidadController.text,
+                              fechaNacimiento: fechaNacimientoController.text,
+                              generoliterario: generoLiterarioController.text,
+                            );
+
+                            // decide si edita o inserta
+                            if (esEditar) {
+                              nuevo.id = autor!.id;
+                              await repo.edit(nuevo);
+                            } else {
+                              await repo.create(nuevo);
+                            }
+
+                            // regresa a la pantalla anterior
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: const Text("Aceptar"),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 5),
+
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Cancelar"),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
-
-              // opciones del menu
-              onChanged: (value) {
-                generoLiterarioController.text = value!;
-                // guarda el valor elegido
-              },
             ),
-
-            TextButton(
-              onPressed: () async {
-                if (formAutor.currentState!.validate()) {
-                  // valida formulario
-
-                  final repo = AutoresRepository();
-                  // crea repositorio
-
-                  final nuevo = AutoresModels(
-                    nombre: nombreController.text,
-                    apellido: apellidoController.text,
-                    nacionalidad: nacionalidadController.text,
-                    fechaNacimiento: fechaNacimientoController.text,
-                    generoliterario: generoLiterarioController.text,
-                  );
-                  // crea objeto autor
-
-                  if (esEditar) {
-                    nuevo.id = autor!.id;
-                    await repo.edit(nuevo);
-                    // edita autor
-                  } else {
-                    await repo.create(nuevo);
-                    // crea autor
-                  }
-
-                  Navigator.pop(context);
-                  // regresa a la pantalla anterior
-                }
-              },
-              child: Text("Aceptar"),
-              // boton guardar
-            ),
-
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-
-              // cierra sin guardar
-              child: Text("Cancelar"),
-            ),
-          ],
+          ),
         ),
       ),
     );

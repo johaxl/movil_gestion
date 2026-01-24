@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/prestamos_models.dart';
 import '../repositories/prestamos_repository.dart';
 
-// pantalla principal de prestamos
 class PrestamoScreen extends StatefulWidget {
   const PrestamoScreen({super.key});
 
@@ -11,35 +10,27 @@ class PrestamoScreen extends StatefulWidget {
 }
 
 class _PrestamoScreenState extends State<PrestamoScreen> {
-  // objeto para usar la base de datos
   final PrestamosRepository repo = PrestamosRepository();
 
-  // lista donde se guardan los prestamos
   List<PrestamosModels> prestamos = [];
-
-  // variable para saber si esta cargando
   bool cargando = true;
 
   @override
   void initState() {
     super.initState();
-    // se ejecuta al iniciar la pantalla
     cargarPrestamos();
   }
 
-  // carga todos los prestamos
   Future<void> cargarPrestamos() async {
     setState(() => cargando = true);
 
-    // actualiza los prestamos atrasados
+    // actualizar automáticamente ATRASADO
     await repo.actualizarAtrasados();
 
-    // obtiene los datos
     prestamos = await repo.getAll();
     setState(() => cargando = false);
   }
 
-  // calcula dias de atraso
   int calcularDiasAtraso(PrestamosModels p) {
     if (p.estado != "ATRASADO") return 0;
     final hoy = DateTime.now();
@@ -47,7 +38,6 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
     return hoy.difference(fechaDev).inDays;
   }
 
-  // devuelve un color segun el estado
   Color colorEstado(String estado) {
     switch (estado) {
       case "ACTIVO":
@@ -61,7 +51,6 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
     }
   }
 
-  // devuelve un icono segun el estado
   IconData iconoEstado(String estado) {
     switch (estado) {
       case "ACTIVO":
@@ -75,13 +64,12 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
     }
   }
 
-  // elimina un prestamo
   void eliminarPrestamo(int id) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("Eliminar Prestamo"),
-        content: const Text("Eliminar el prestamo"),
+        title: const Text("Eliminar Préstamo"),
+        content: const Text("¿Eliminar el préstamo?"),
         actions: [
           TextButton(
             onPressed: () async {
@@ -100,7 +88,6 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
     );
   }
 
-  // abre pantalla para editar
   void editarPrestamo(PrestamosModels p) async {
     await Navigator.pushNamed(context, '/prestamo/form', arguments: p);
     cargarPrestamos();
@@ -109,9 +96,8 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // barra superior
       appBar: AppBar(
-        title: const Text("Listado de Prestamos"),
+        title: const Text("Listado de Préstamos"),
         backgroundColor: const Color.fromARGB(255, 242, 201, 76),
         foregroundColor: Colors.white,
         centerTitle: true,
@@ -126,11 +112,10 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
         ],
       ),
 
-      // cuerpo de la pantalla
       body: cargando
           ? const Center(child: CircularProgressIndicator())
           : prestamos.isEmpty
-          ? const Center(child: Text("No hay prestamos registrados"))
+          ? const Center(child: Text("No hay préstamos registrados"))
           : ListView.builder(
               itemCount: prestamos.length,
               itemBuilder: (context, i) {
@@ -138,37 +123,50 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
                 final diasAtraso = calcularDiasAtraso(p);
 
                 return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   child: ListTile(
-                    // icono segun estado
                     leading: Icon(
                       iconoEstado(p.estado),
                       color: colorEstado(p.estado),
                     ),
-
-                    // muestra libro y usuario
                     title: Text(
                       "${p.libroNombre ?? "Libro"}  |  ${p.usuarioNombre ?? "Usuario"}",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-
-                    // informacion del prestamo
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Prestamo: ${p.fechaPrestamo}"),
-                        Text("Devolucion: ${p.fechaDevolucion}"),
-                        Text("Estado: ${p.estado}"),
+                        Text("Préstamo: ${p.fechaPrestamo}"),
+                        Text("Devolución: ${p.fechaDevolucion}"),
+                        Text(
+                          "Estado: ${p.estado}",
+                          style: TextStyle(
+                            color: colorEstado(p.estado),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         if (p.estado == "ATRASADO")
-                          Text("Dias de atraso: $diasAtraso"),
+                          Text(
+                            "Días de atraso: $diasAtraso",
+                            style: const TextStyle(
+                              color: Color.fromARGB(255, 90, 84, 83),
+                            ),
+                          ),
                       ],
                     ),
-
-                    // botones de acciones
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (p.estado != "DEVUELTO")
                           IconButton(
-                            icon: const Icon(Icons.assignment_turned_in),
+                            icon: const Icon(
+                              Icons.assignment_turned_in,
+                              color: Colors.blue,
+                            ),
+                            tooltip: "Marcar como devuelto",
                             onPressed: () async {
                               await repo.marcarDevuelto(p.id!);
                               cargarPrestamos();
@@ -176,7 +174,7 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
                           ),
                         if (p.estado == "DEVUELTO")
                           IconButton(
-                            icon: const Icon(Icons.delete),
+                            icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () => eliminarPrestamo(p.id!),
                           ),
                       ],
@@ -185,15 +183,13 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
                 );
               },
             ),
-
-      // boton para agregar prestamo
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.pushNamed(context, '/prestamo/form');
           cargarPrestamos();
         },
         backgroundColor: const Color.fromARGB(255, 242, 201, 76),
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

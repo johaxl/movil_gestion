@@ -1,215 +1,265 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-// permite validar y limitar lo que se escribe
-
+import 'package:flutter/services.dart'; // para input formatters
 import '../models/libros_models.dart';
-// importa el modelo libro
-
 import '../models/autores_models.dart';
-// importa el modelo autor
-
 import '../repositories/libros_repository.dart';
-// importa repositorio de libros
-
 import '../repositories/autores_repository.dart';
-// importa repositorio de autores
 
 class LibroFormScreen extends StatefulWidget {
   const LibroFormScreen({super.key});
-  // pantalla del formulario de libros
 
   @override
   State<LibroFormScreen> createState() => _LibroFormScreenState();
-  // crea el estado de la pantalla
 }
 
 class _LibroFormScreenState extends State<LibroFormScreen> {
+  // key del formulario
   final formLibro = GlobalKey<FormState>();
-  // llave para validar el formulario
 
+  // controllers
   final tituloController = TextEditingController();
-  // controla el campo titulo
-
   final isbnController = TextEditingController();
-  // controla el campo isbn
-
   final idAutorController = TextEditingController();
-  // guarda el id del autor
-
   final anioController = TextEditingController();
-  // controla el campo anio
-
   final editorialController = TextEditingController();
-  // controla el campo editorial
 
+  // objeto libro para editar
   LibrosModels? libro;
-  // guarda el libro si se edita
 
+  // evita recargar datos
   bool cargado = false;
-  // evita cargar datos varias veces
 
-  List<AutoresModels> autores = [];
   // lista de autores
+  List<AutoresModels> autores = [];
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // se ejecuta cuando recibe datos
 
     if (!cargado) {
       final args = ModalRoute.of(context)!.settings.arguments;
-      // recibe datos de la pantalla anterior
 
+      // es edción
       if (args != null) {
         libro = args as LibrosModels;
-        // convierte datos en libro
-
         tituloController.text = libro!.titulo;
-        // carga titulo
-
         isbnController.text = libro!.isbn;
-        // carga isbn
-
         idAutorController.text = libro!.idAutor.toString();
-        // carga id autor
-
         anioController.text = libro!.anioPublicacion.toString();
-        // carga anio
-
         editorialController.text = libro!.editorial;
-        // carga editorial
       }
 
+      // carga autores
       cargarAutores();
-      // carga lista de autores
-
       cargado = true;
-      // marca que ya se cargo
     }
   }
 
+  // obtiene la lista de autores
   Future<void> cargarAutores() async {
     final repo = AutoresRepository();
-    // crea repositorio de autores
-
     autores = await repo.getAll();
-    // obtiene todos los autores
-
     setState(() {});
-    // actualiza pantalla
   }
 
   @override
   Widget build(BuildContext context) {
     final esEditar = libro != null;
-    // verifica si es edicion o insercion
 
     return Scaffold(
       appBar: AppBar(
         title: Text(esEditar ? "Editar Libro" : "Insertar Libro"),
-        // titulo segun accion
+        backgroundColor: const Color.fromARGB(255, 107, 197, 180),
+        foregroundColor: Colors.white,
+        centerTitle: true,
       ),
-      body: Form(
-        key: formLibro,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SingleChildScrollView(
+          child: Form(
+            key: formLibro,
+            child: Column(
+              children: [
+                // título
+                TextFormField(
+                  controller: tituloController,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Campo requerido" : null,
+                  decoration: InputDecoration(
+                    labelText: "Título",
+                    hintText: "Ingrese el título del libro",
+                    prefixIcon: const Icon(Icons.book),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
 
-        // formulario
-        child: Column(
-          children: [
-            TextFormField(
-              controller: tituloController,
+                SizedBox(height: 10),
 
-              // campo titulo
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Campo requerido" : null,
-              // valida que no este vacio
-            ),
+                // isbn
+                TextFormField(
+                  controller: isbnController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly, // solo números
+                    LengthLimitingTextInputFormatter(13), // máximo 13
+                  ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Campo requerido";
+                    }
+                    if (value.length != 13) {
+                      return "El ISBN debe tener exactamente 13 dígitos";
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    labelText: "ISBN",
+                    hintText: "Ingrese el ISBN (13 dígitos)",
+                    prefixIcon: const Icon(Icons.qr_code),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
 
-            TextFormField(
-              controller: isbnController,
-              keyboardType: TextInputType.number,
+                SizedBox(height: 10),
 
-              // solo permite numeros
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
+                // autor relacionado
+                DropdownButtonFormField<String>(
+                  initialValue: autores.isEmpty
+                      ? null
+                      : idAutorController.text.isEmpty
+                      ? null
+                      : idAutorController.text,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Campo requerido" : null,
+                  decoration: InputDecoration(
+                    labelText: "Autor",
+                    hintText: "Seleccione el autor del libro",
+                    prefixIcon: const Icon(Icons.person),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  items: autores.map((autor) {
+                    return DropdownMenuItem(
+                      value: autor.id.toString(),
+                      child: Text("${autor.nombre} ${autor.apellido}"),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      idAutorController.text = value!;
+                    });
+                  },
+                ),
 
-                // solo numeros
-                LengthLimitingTextInputFormatter(13),
-                // maximo 13 digitos
+                const SizedBox(height: 10),
+
+                // año de publicación
+                TextFormField(
+                  controller: anioController,
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Campo requerido";
+                    }
+
+                    final anio = int.tryParse(value);
+                    if (anio == null) {
+                      return "Solo números";
+                    }
+
+                    final anioActual = DateTime.now().year;
+                    if (anio > anioActual) {
+                      return "No puede ser mayor al año actual";
+                    }
+
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    labelText: "Año de Publicación",
+                    hintText: "Ingrese el año de publicación",
+                    prefixIcon: const Icon(Icons.calendar_today),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                // editorial
+                TextFormField(
+                  controller: editorialController,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Campo requerido" : null,
+                  decoration: InputDecoration(
+                    labelText: "Editorial",
+                    hintText: "Ingrese la editorial del libro",
+                    prefixIcon: const Icon(Icons.business),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                // botones
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () async {
+                          if (formLibro.currentState!.validate()) {
+                            final repo = LibrosRepository();
+
+                            final nuevo = LibrosModels(
+                              titulo: tituloController.text,
+                              isbn: isbnController.text,
+                              idAutor: int.parse(idAutorController.text),
+                              anioPublicacion: int.parse(anioController.text),
+                              editorial: editorialController.text,
+                            );
+
+                            if (esEditar) {
+                              nuevo.id = libro!.id;
+                              await repo.edit(nuevo);
+                            } else {
+                              await repo.create(nuevo);
+                            }
+
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: const Text("Aceptar"),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 5),
+
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Cancelar"),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
-
-            DropdownButtonFormField<String>(
-              initialValue: autores.isEmpty
-                  ? null
-                  : idAutorController.text.isEmpty
-                  ? null
-                  : idAutorController.text,
-
-              // valor inicial del menu
-              items: autores.map((autor) {
-                return DropdownMenuItem(
-                  value: autor.id.toString(),
-                  child: Text("${autor.nombre} ${autor.apellido}"),
-                );
-              }).toList(),
-
-              // lista de autores
-              onChanged: (value) {
-                idAutorController.text = value!;
-                // guarda el id del autor
-              },
-            ),
-
-            TextFormField(
-              controller: anioController,
-              keyboardType: TextInputType.number,
-              // campo anio
-            ),
-
-            TextFormField(
-              controller: editorialController,
-              // campo editorial
-            ),
-
-            TextButton(
-              onPressed: () async {
-                if (formLibro.currentState!.validate()) {
-                  final repo = LibrosRepository();
-                  // crea repositorio libros
-
-                  final nuevo = LibrosModels(
-                    titulo: tituloController.text,
-                    isbn: isbnController.text,
-                    idAutor: int.parse(idAutorController.text),
-                    anioPublicacion: int.parse(anioController.text),
-                    editorial: editorialController.text,
-                  );
-                  // crea objeto libro
-
-                  if (esEditar) {
-                    nuevo.id = libro!.id;
-                    await repo.edit(nuevo);
-                    // edita libro
-                  } else {
-                    await repo.create(nuevo);
-                    // crea libro
-                  }
-
-                  Navigator.pop(context);
-                  // regresa a la pantalla anterior
-                }
-              },
-              child: Text("Aceptar"),
-              // boton guardar
-            ),
-
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-
-              // cierra sin guardar
-              child: Text("Cancelar"),
-            ),
-          ],
+          ),
         ),
       ),
     );
