@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart'; // para input formatters
 import '../models/libros_models.dart';
 import '../models/autores_models.dart';
 import '../repositories/libros_repository.dart';
@@ -39,7 +39,7 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
     if (!cargado) {
       final args = ModalRoute.of(context)!.settings.arguments;
 
-      // si viene libro, es edición
+      // es edción
       if (args != null) {
         libro = args as LibrosModels;
         tituloController.text = libro!.titulo;
@@ -95,16 +95,28 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 // isbn
                 TextFormField(
                   controller: isbnController,
-                  validator: (value) =>
-                      value == null || value.isEmpty ? "Campo requerido" : null,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly, // solo números
+                    LengthLimitingTextInputFormatter(13), // máximo 13
+                  ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Campo requerido";
+                    }
+                    if (value.length != 13) {
+                      return "El ISBN debe tener exactamente 13 dígitos";
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                     labelText: "ISBN",
-                    hintText: "Ingrese el ISBN del libro",
+                    hintText: "Ingrese el ISBN (13 dígitos)",
                     prefixIcon: const Icon(Icons.qr_code),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -112,11 +124,11 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 // autor relacionado
                 DropdownButtonFormField<String>(
-                  value: autores.isEmpty
+                  initialValue: autores.isEmpty
                       ? null
                       : idAutorController.text.isEmpty
                       ? null
