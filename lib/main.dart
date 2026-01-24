@@ -6,6 +6,7 @@ import 'libros/libros_forms_screen.dart';
 import 'libros/libros_screen.dart';
 import 'prestamos/prestamos_forms_screen.dart';
 import 'prestamos/prestamos_screen.dart';
+import 'reporte/reporte.dart';
 import 'screens/homes_screen.dart';
 import 'usuarios/usuarios_forms_screen.dart';
 import 'usuarios/usuarios_screen.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         '/usuario/form': (context) => UsuarioFormScreen(),
         '/prestamo': (context) => PrestamoScreen(),
         '/prestamo/form': (context) => PrestamoFormScreen(),
+        '/reporte': (context) => ReportePrestamosScreen(),
       },
     );
   }

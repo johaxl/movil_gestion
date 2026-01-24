@@ -105,4 +105,35 @@ class PrestamosRepository {
       whereArgs: [id],
     );
   }
+
+  Future<List<PrestamosModels>> reportePrestamos(
+    String estado,
+    String desde,
+    String hasta,
+  ) async {
+    final db = await database.db;
+
+    final response = await db.rawQuery(
+      '''
+    SELECT
+      p.id,
+      p.id_libro,
+      p.id_usuario,
+      p.fecha_prestamo,
+      p.fecha_devolucion,
+      p.estado,
+      l.titulo AS libro_nombre,
+      u.nombre || ' ' || u.apellido AS usuario_nombre
+    FROM prestamos p
+    INNER JOIN libros l ON l.id = p.id_libro
+    INNER JOIN usuarios u ON u.id = p.id_usuario
+    WHERE p.estado = ?
+    AND date(p.fecha_prestamo) BETWEEN ? AND ?
+    ORDER BY p.fecha_prestamo
+  ''',
+      [estado, desde, hasta],
+    );
+
+    return response.map((e) => PrestamosModels.fromMap(e)).toList();
+  }
 }
