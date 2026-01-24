@@ -4,49 +4,57 @@ import '../repositories/libros_repository.dart';
 
 class LibroScreen extends StatefulWidget {
   const LibroScreen({super.key});
+  // pantalla principal de libros
 
   @override
   State<LibroScreen> createState() => _LibroScreenState();
+  // crea el estado de la pantalla
 }
 
 class _LibroScreenState extends State<LibroScreen> {
-  // repositorio para acceder a la base de datos
   final LibrosRepository repo = LibrosRepository();
+  // objeto para acceder a la base de datos
 
-  // lista de libros
   List<LibrosModels> libros = [];
+  // lista donde se guardan los libros
 
-  // controla si se están cargando los datos
   bool cargando = true;
+  // controla si se estan cargando los datos
 
   @override
   void initState() {
     super.initState();
-    // carga los libros al iniciar la pantalla
     cargarLibros();
+    // se ejecuta al iniciar la pantalla
   }
 
-  // obtiene todos los libros desde la base de datos
   Future<void> cargarLibros() async {
     setState(() => cargando = true);
+    // activa el estado cargando
+
     libros = await repo.getAll();
+    // obtiene todos los libros
+
     setState(() => cargando = false);
+    // desactiva el estado cargando
   }
 
-  // Valida si tiene relación antes de eliminar
   Future<void> eliminarLibro(int id) async {
-    // Verifica si el autor está relacionado
     final tieneRelacion = await repo.tieneRelacion(id);
+    // verifica si el libro tiene relacion
 
-    // Si tiene relación, no permite eliminar
     if (tieneRelacion) {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: Text("No se puede eliminar"),
+
+          // titulo del mensaje
           content: Text(
             "Este libro tiene registros relacionados y no puede eliminarse",
           ),
+
+          // mensaje de advertencia
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -56,20 +64,29 @@ class _LibroScreenState extends State<LibroScreen> {
         ),
       );
       return;
+      // no deja eliminar
     }
 
-    // Si no tiene relación, pide confirmación
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text("Eliminar Libro"),
-        content: Text("¿Está seguro de eliminar el libro?"),
+
+        // titulo del dialogo
+        content: Text("Esta seguro de eliminar el libro"),
+
+        // pide confirmacion
         actions: [
           TextButton(
             onPressed: () async {
               await repo.delete(id);
+              // elimina el libro en la base de datos
+
               Navigator.pop(context);
+              // cierra el dialogo
+
               cargarLibros();
+              // recarga la lista
             },
             child: Text("SI"),
           ),
@@ -85,23 +102,28 @@ class _LibroScreenState extends State<LibroScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // barra superior
+      // estructura principal
       appBar: AppBar(
         title: const Text("Listado de Libros"),
         backgroundColor: const Color.fromARGB(255, 107, 197, 180),
         foregroundColor: Colors.white,
         centerTitle: true,
+        // barra superior
       ),
 
-      // cuerpo de la pantalla
       body: cargando
           ? const Center(child: CircularProgressIndicator())
+          // muestra cargando
           : libros.isEmpty
           ? const Center(child: Text("No hay libros registrados"))
+          // mensaje si no hay datos
           : ListView.builder(
               itemCount: libros.length,
+
+              // cantidad de libros
               itemBuilder: (context, i) {
                 final libro = libros[i];
+                // obtiene un libro
 
                 return Card(
                   child: ListTile(
@@ -110,19 +132,21 @@ class _LibroScreenState extends State<LibroScreen> {
                       color: Color.fromARGB(255, 107, 197, 180),
                     ),
 
-                    // título del libro
+                    // icono del libro
                     title: Text(libro.titulo),
 
-                    // autor e isbn
+                    // muestra el titulo
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("Autor: ${libro.autorNombre ?? 'Sin autor'}"),
+
+                        // muestra el autor
                         Text("ISBN: ${libro.isbn}"),
+                        // muestra el isbn
                       ],
                     ),
 
-                    // botones
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -134,11 +158,14 @@ class _LibroScreenState extends State<LibroScreen> {
                               arguments: libro,
                             );
                             cargarLibros();
+                            // va a editar y recarga
                           },
                           icon: const Icon(Icons.edit, color: Colors.orange),
                         ),
                         IconButton(
                           onPressed: () => eliminarLibro(libro.id!),
+
+                          // elimina el libro
                           icon: const Icon(Icons.delete, color: Colors.red),
                         ),
                       ],
@@ -148,14 +175,15 @@ class _LibroScreenState extends State<LibroScreen> {
               },
             ),
 
-      // botón para agregar libro
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.pushNamed(context, '/libro/form');
           cargarLibros();
+          // va a crear y recarga
         },
         child: const Icon(Icons.add, color: Colors.white),
         backgroundColor: const Color.fromARGB(255, 107, 197, 180),
+        // boton para agregar libro
       ),
     );
   }

@@ -4,48 +4,57 @@ import '../repositories/autores_repository.dart';
 
 class AutorScreen extends StatefulWidget {
   const AutorScreen({super.key});
+  // pantalla principal de autores
 
   @override
   State<AutorScreen> createState() => _AutorScreenState();
+  // crea el estado de la pantalla
 }
 
 class _AutorScreenState extends State<AutorScreen> {
-  // Instancia del repositorio de autores
   final AutoresRepository repo = AutoresRepository();
+  // objeto para acceder a la base de datos
 
-  // Lista donde se guardan los autores
   List<AutoresModels> autores = [];
+  // lista donde se guardan los autores
 
-  // Controla el estado de carga
   bool cargando = true;
+  // controla si esta cargando
 
   @override
   void initState() {
     super.initState();
     cargarAutores();
+    // se ejecuta al iniciar la pantalla
   }
 
-  // Obtiene todos los autores desde la base de datos
   Future<void> cargarAutores() async {
     setState(() => cargando = true);
+    // activa el estado cargando
+
     autores = await repo.getAll();
+    // obtiene todos los autores
+
     setState(() => cargando = false);
+    // desactiva el estado cargando
   }
 
-  // Valida si el autor tiene relación antes de eliminar
   Future<void> eliminarAutor(int id) async {
-    // Verifica si el autor está relacionado
     final tieneRelacion = await repo.tieneRelacion(id);
+    // verifica si el autor tiene relacion
 
-    // Si tiene relación, no permite eliminar
     if (tieneRelacion) {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: Text("No se puede eliminar"),
+
+          // titulo del mensaje
           content: Text(
             "Este autor tiene registros relacionados y no puede eliminarse",
           ),
+
+          // mensaje de advertencia
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -55,20 +64,29 @@ class _AutorScreenState extends State<AutorScreen> {
         ),
       );
       return;
+      // no deja eliminar
     }
 
-    // Si no tiene relación, pide confirmación
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text("Eliminar Autor"),
+
+        // titulo del dialogo
         content: Text("¿Está seguro de eliminar el autor?"),
+
+        // pide confirmacion
         actions: [
           TextButton(
             onPressed: () async {
               await repo.delete(id);
+              // elimina en la base de datos
+
               Navigator.pop(context);
+              // cierra el dialogo
+
               cargarAutores();
+              // recarga la lista
             },
             child: Text("SI"),
           ),
@@ -84,24 +102,30 @@ class _AutorScreenState extends State<AutorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // estructura principal
       appBar: AppBar(
         title: Text("Listado de Autores"),
         backgroundColor: const Color.fromARGB(255, 74, 144, 226),
         foregroundColor: Colors.white,
         centerTitle: true,
+        // barra superior
       ),
 
-      // Muestra un cargador mientras se obtienen los datos
       body: cargando
           ? SingleChildScrollView(
               child: Center(child: CircularProgressIndicator()),
             )
+          // muestra cargando
           : autores.isEmpty
           ? Center(child: Text("No hay autores registrados"))
+          // muestra mensaje si no hay datos
           : ListView.builder(
               itemCount: autores.length,
+
+              // cantidad de autores
               itemBuilder: (context, i) {
                 final autor = autores[i];
+                // obtiene un autor
 
                 return Card(
                   child: ListTile(
@@ -110,22 +134,24 @@ class _AutorScreenState extends State<AutorScreen> {
                       color: const Color.fromARGB(255, 74, 144, 226),
                     ),
 
-                    // Nombre completo del autor
+                    // icono del autor
                     title: Text("${autor.nombre} ${autor.apellido}"),
 
-                    // Información adicional del autor
+                    // muestra nombre completo
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("Nacionalidad: ${autor.nacionalidad}"),
+
+                        // muestra nacionalidad
                         Text(
                           autor.fechaNacimiento,
                           style: TextStyle(fontSize: 12),
                         ),
+                        // muestra fecha
                       ],
                     ),
 
-                    // Botones de editar y eliminar
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -137,11 +163,14 @@ class _AutorScreenState extends State<AutorScreen> {
                               arguments: autor,
                             );
                             cargarAutores();
+                            // va a editar y recarga
                           },
                           icon: Icon(Icons.edit, color: Colors.orange),
                         ),
                         IconButton(
                           onPressed: () => eliminarAutor(autor.id!),
+
+                          // elimina el autor
                           icon: Icon(Icons.delete, color: Colors.red),
                         ),
                       ],
@@ -151,14 +180,15 @@ class _AutorScreenState extends State<AutorScreen> {
               },
             ),
 
-      // Botón para agregar un nuevo autor
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.pushNamed(context, '/autor/form');
           cargarAutores();
+          // va a crear y recarga
         },
         child: Icon(Icons.add, color: Colors.white),
         backgroundColor: const Color.fromARGB(255, 74, 144, 226),
+        // boton para agregar
       ),
     );
   }

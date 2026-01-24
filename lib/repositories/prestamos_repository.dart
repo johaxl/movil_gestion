@@ -106,6 +106,7 @@ class PrestamosRepository {
     );
   }
 
+  // reporte de prestamos segun estado y rango de fechas
   Future<List<PrestamosModels>> reportePrestamos(
     String estado,
     String desde,
