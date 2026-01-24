@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+// importa los componentes basicos de flutter
 
 import '../models/usuarios_models.dart';
+// importa el modelo de usuario
+
 import '../repositories/usuarios_repository.dart';
+// importa la clase que maneja la base de datos
 
 class UsuarioScreen extends StatefulWidget {
   const UsuarioScreen({super.key});
@@ -11,34 +15,35 @@ class UsuarioScreen extends StatefulWidget {
 }
 
 class _UsuarioScreenState extends State<UsuarioScreen> {
-  // repositorio de usuarios
+  // repositorio para acceder a la base de datos
   final UsuariosRepository repo = UsuariosRepository();
 
-  // lista de usuarios
+  // lista donde se guardan los usuarios
   List<UsuariosModels> usuarios = [];
 
-  // controla la carga
+  // controla si esta cargando datos
   bool cargando = true;
 
   @override
   void initState() {
     super.initState();
     cargarUsuarios();
+    // se ejecuta al iniciar la pantalla
   }
 
-  // carga los usuarios
+  // obtiene todos los usuarios de la base
   Future<void> cargarUsuarios() async {
     setState(() => cargando = true);
     usuarios = await repo.getAll();
     setState(() => cargando = false);
   }
 
-  // Valida si tiene relación antes de eliminar
+  // elimina un usuario si no tiene relacion
   Future<void> eliminarUsuario(int id) async {
-    // Verifica si el usuario está relacionado
+    // verifica si el usuario tiene relacion
     final tieneRelacion = await repo.tieneRelacion(id);
 
-    // Si tiene relación, no permite eliminar
+    // si tiene relacion muestra mensaje
     if (tieneRelacion) {
       showDialog(
         context: context,
@@ -58,12 +63,12 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
       return;
     }
 
-    // Si no tiene relación, pide confirmación
+    // si no tiene relacion pide confirmacion
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text("Eliminar Usuario"),
-        content: Text("¿Está seguro de eliminar el usuario?"),
+        content: Text("Esta seguro de eliminar el usuario"),
         actions: [
           TextButton(
             onPressed: () async {
@@ -92,10 +97,13 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
         centerTitle: true,
       ),
 
+      // si esta cargando muestra loading
       body: cargando
           ? const Center(child: CircularProgressIndicator())
+          // si no hay usuarios muestra mensaje
           : usuarios.isEmpty
           ? const Center(child: Text("No hay usuarios registrados"))
+          // si hay usuarios los muestra en lista
           : ListView.builder(
               itemCount: usuarios.length,
               itemBuilder: (context, i) {
@@ -108,19 +116,19 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
                       color: Color.fromARGB(255, 145, 93, 17),
                     ),
 
-                    // nombre completo
+                    // muestra nombre y apellido
                     title: Text("${user.nombre} ${user.apellido}"),
 
-                    // cédula y correo
+                    // muestra cedula y correo
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Cédula: ${user.cedula}"),
+                        Text("Cedula: ${user.cedula}"),
                         Text("Correo: ${user.correo}"),
                       ],
                     ),
 
-                    // botones
+                    // botones editar y eliminar
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -146,6 +154,7 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
               },
             ),
 
+      // boton flotante para agregar usuario
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.pushNamed(context, '/usuario/form');
