@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-// importa los componentes basicos de flutter
-
 import '../models/usuarios_models.dart';
-// importa el modelo de usuario
-
 import '../repositories/usuarios_repository.dart';
-// importa la clase que maneja la base de datos
 
 class UsuarioScreen extends StatefulWidget {
   const UsuarioScreen({super.key});
