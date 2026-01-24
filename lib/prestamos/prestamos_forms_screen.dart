@@ -109,7 +109,7 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
 
     if (hora == null) return;
 
-    if (hora.hour < 8 || hora.hour > 18) {
+    if (hora.hour < 8 || (hora.hour == 18 && hora.minute > 0)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("La hora debe estar entre 8:00 AM y 6:00 PM"),
