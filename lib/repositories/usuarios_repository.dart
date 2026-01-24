@@ -49,4 +49,18 @@ class UsuariosRepository {
     final response = await db.query(tableName);
     return response.map((e) => UsuariosModels.fromMap(e)).toList();
   }
+
+  // valida si tiene relación con préstamos
+  Future<bool> tieneRelacion(int libroId) async {
+    final db = await database.db;
+
+    final response = await db.query(
+      'prestamos',
+      where: 'id_usuario = ?',
+      whereArgs: [libroId],
+      limit: 1,
+    );
+
+    return response.isNotEmpty;
+  }
 }

@@ -33,42 +33,49 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
     setState(() => cargando = false);
   }
 
-  // intenta eliminar un usuario
-  void eliminarUsuario(int id) {
+  // Valida si tiene relación antes de eliminar
+  Future<void> eliminarUsuario(int id) async {
+    // Verifica si el usuario está relacionado
+    final tieneRelacion = await repo.tieneRelacion(id);
+
+    // Si tiene relación, no permite eliminar
+    if (tieneRelacion) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text("No se puede eliminar"),
+          content: Text(
+            "Este usuario tiene registros relacionados y no puede eliminarse",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Aceptar"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // Si no tiene relación, pide confirmación
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("Eliminar Usuario"),
-        content: const Text("¿Eliminar usuario?"),
+        title: Text("Eliminar Usuario"),
+        content: Text("¿Está seguro de eliminar el usuario?"),
         actions: [
           TextButton(
             onPressed: () async {
-              // intenta eliminar
-              final result = await repo.delete(id);
-
-              // cierra el diálogo
+              await repo.delete(id);
               Navigator.pop(context);
-
-              // si está relacionado, no se elimina
-              if (result == -1) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      "No se puede eliminar el usuario porque tiene préstamos",
-                    ),
-                  ),
-                );
-                return;
-              }
-
-              // recarga la lista si se eliminó
               cargarUsuarios();
             },
-            child: const Text("SI"),
+            child: Text("SI"),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("NO"),
+            child: Text("NO"),
           ),
         ],
       ),
