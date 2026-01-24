@@ -41,7 +41,7 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
   void initState() {
     super.initState();
     fechaPrestamoController.text = DateFormat(
-      'yyyy-MM-dd',
+      'yyyy-MM-dd HH:mm',
     ).format(DateTime.now());
   }
 
@@ -65,7 +65,6 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
     cargarDatos();
   }
 
-  // carga usuarios y libros disponibles
   Future<void> cargarDatos() async {
     usuarios = await usuariosRepo.getAll();
     final libros = await librosRepo.getAll();
@@ -82,14 +81,57 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
     setState(() {});
   }
 
-  // calcula el estado del préstamo
   void calcularEstado() {
     if (estado == "DEVUELTO") return;
 
     final hoy = DateTime.now();
-    final devolucion = DateTime.parse(fechaDevolucionController.text);
+    final devolucion = DateFormat(
+      'yyyy-MM-dd HH:mm',
+    ).parse(fechaDevolucionController.text);
 
     estado = devolucion.isBefore(hoy) ? "ATRASADO" : "ACTIVO";
+  }
+
+  Future<void> seleccionarFechaHora() async {
+    final fecha = await showDatePicker(
+      context: context,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDate: DateTime.now(),
+    );
+
+    if (fecha == null) return;
+
+    final hora = await showTimePicker(
+      context: context,
+      initialTime: const TimeOfDay(hour: 8, minute: 0),
+    );
+
+    if (hora == null) return;
+
+    if (hora.hour < 8 || hora.hour > 18) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("La hora debe estar entre 8:00 AM y 6:00 PM"),
+        ),
+      );
+      return;
+    }
+
+    final fechaHora = DateTime(
+      fecha.year,
+      fecha.month,
+      fecha.day,
+      hora.hour,
+      hora.minute,
+    );
+
+    fechaDevolucionController.text = DateFormat(
+      'yyyy-MM-dd HH:mm',
+    ).format(fechaHora);
+
+    calcularEstado();
+    setState(() {});
   }
 
   @override
@@ -163,26 +205,11 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
               TextFormField(
                 controller: fechaDevolucionController,
                 readOnly: true,
-                onTap: () async {
-                  final fecha = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                    initialDate: DateTime.now(),
-                  );
-
-                  if (fecha != null) {
-                    fechaDevolucionController.text = DateFormat(
-                      'yyyy-MM-dd',
-                    ).format(fecha);
-                    calcularEstado();
-                    setState(() {});
-                  }
-                },
+                onTap: seleccionarFechaHora,
                 validator: (v) =>
-                    v == null || v.isEmpty ? "Seleccione fecha" : null,
+                    v == null || v.isEmpty ? "Seleccione fecha y hora" : null,
                 decoration: InputDecoration(
-                  labelText: "Fecha Devolución",
+                  labelText: "Fecha y Hora Devolución",
                   prefixIcon: const Icon(Icons.event),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
