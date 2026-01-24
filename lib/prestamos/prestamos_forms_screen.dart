@@ -97,7 +97,7 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(esEditar ? "Editar Préstamo" : "Nuevo Préstamo"),
-        backgroundColor: Colors.red.shade700,
+        backgroundColor: const Color.fromARGB(255, 242, 201, 76),
         foregroundColor: Colors.white,
         centerTitle: true,
       ),

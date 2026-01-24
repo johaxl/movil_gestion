@@ -98,7 +98,7 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Listado de Préstamos"),
-        backgroundColor: Colors.red.shade700,
+        backgroundColor: const Color.fromARGB(255, 242, 201, 76),
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
@@ -150,14 +150,23 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.orange),
-                          onPressed: () => editarPrestamo(p),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => eliminarPrestamo(p.id!),
-                        ),
+                        if (p.estado != "DEVUELTO")
+                          IconButton(
+                            icon: const Icon(
+                              Icons.assignment_turned_in,
+                              color: Colors.blue,
+                            ),
+                            tooltip: "Marcar como devuelto",
+                            onPressed: () async {
+                              await repo.marcarDevuelto(p.id!);
+                              cargarPrestamos();
+                            },
+                          ),
+                        if (p.estado == "DEVUELTO")
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => eliminarPrestamo(p.id!),
+                          ),
                       ],
                     ),
                   ),
@@ -169,8 +178,8 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
           await Navigator.pushNamed(context, '/prestamo/form');
           cargarPrestamos();
         },
-        backgroundColor: Colors.red.shade700,
-        child: const Icon(Icons.add),
+        backgroundColor: const Color.fromARGB(255, 242, 201, 76),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

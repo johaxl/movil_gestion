@@ -95,4 +95,14 @@ class PrestamosRepository {
       [hoy],
     );
   }
+
+  Future<void> marcarDevuelto(int id) async {
+    final db = await database.db;
+    await db.update(
+      'prestamos',
+      {'estado': 'DEVUELTO'},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }

@@ -33,43 +33,49 @@ class _LibroScreenState extends State<LibroScreen> {
     setState(() => cargando = false);
   }
 
-  // muestra un cuadro para confirmar la eliminación
-  void eliminarLibro(int id) {
+  // Valida si tiene relación antes de eliminar
+  Future<void> eliminarLibro(int id) async {
+    // Verifica si el autor está relacionado
+    final tieneRelacion = await repo.tieneRelacion(id);
+
+    // Si tiene relación, no permite eliminar
+    if (tieneRelacion) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text("No se puede eliminar"),
+          content: Text(
+            "Este libro tiene registros relacionados y no puede eliminarse",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Aceptar"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // Si no tiene relación, pide confirmación
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("Eliminar Libro"),
-        content: const Text("¿Desea eliminar el libro?"),
+        title: Text("Eliminar Libro"),
+        content: Text("¿Está seguro de eliminar el libro?"),
         actions: [
           TextButton(
             onPressed: () async {
-              // intenta eliminar
-              final result = await repo.delete(id);
-
-              // cierra el diálogo
+              await repo.delete(id);
               Navigator.pop(context);
-
-              // si está relacionado, no se elimina
-              if (result == -1) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      "No se puede eliminar el libro porque tiene préstamos",
-                    ),
-                  ),
-                );
-                return;
-              }
-
-              // recarga la lista si se eliminó
               cargarLibros();
             },
-            child: const Text("SI"),
+            child: Text("SI"),
           ),
           TextButton(
-            // cierra el diálogo sin eliminar
             onPressed: () => Navigator.pop(context),
-            child: const Text("NO"),
+            child: Text("NO"),
           ),
         ],
       ),
