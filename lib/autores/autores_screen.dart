@@ -93,7 +93,9 @@ class _AutorScreenState extends State<AutorScreen> {
 
       // Muestra un cargador mientras se obtienen los datos
       body: cargando
-          ? Center(child: CircularProgressIndicator())
+          ? SingleChildScrollView(
+              child: Center(child: CircularProgressIndicator()),
+            )
           : autores.isEmpty
           ? Center(child: Text("No hay autores registrados"))
           : ListView.builder(

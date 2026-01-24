@@ -29,106 +29,108 @@ class HomeScreen extends StatelessWidget {
             ), // el thickness es para ajustar el grosor
             Padding(
               padding: const EdgeInsets.all(10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 150,
-                          width: 150,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 74, 144, 226),
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Icon(
-                            Icons.person,
-                            size: 100,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            height: 60,
+              child: SingleChildScrollView(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 150,
+                            width: 150,
                             decoration: BoxDecoration(
                               color: const Color.fromARGB(255, 74, 144, 226),
-                              borderRadius: BorderRadius.circular(18),
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.person, color: Colors.white),
-                                SizedBox(width: 10),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pushNamed(context, '/autor');
-                                  },
-                                  child: Text("Autores"),
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    foregroundColor: Colors.white,
+                            child: Icon(
+                              Icons.person,
+                              size: 100,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 74, 144, 226),
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.person, color: Colors.white),
+                                  SizedBox(width: 10),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, '/autor');
+                                    },
+                                    child: Text("Autores"),
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: Colors.white,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 150,
-                          width: 150,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 107, 197, 180),
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Icon(
-                            Icons.book,
-                            size: 100,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            height: 60,
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 150,
+                            width: 150,
                             decoration: BoxDecoration(
                               color: const Color.fromARGB(255, 107, 197, 180),
-                              borderRadius: BorderRadius.circular(18),
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.book, color: Colors.white),
-                                SizedBox(width: 10),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pushNamed(context, '/libro');
-                                  },
-                                  child: Text("Libros"),
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    foregroundColor: Colors.white,
-                                  ),
-                                ),
-                              ],
+                            child: Icon(
+                              Icons.book,
+                              size: 100,
+                              color: Colors.white,
                             ),
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 107, 197, 180),
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.book, color: Colors.white),
+                                  SizedBox(width: 10),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, '/libro');
+                                    },
+                                    child: Text("Libros"),
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Padding(

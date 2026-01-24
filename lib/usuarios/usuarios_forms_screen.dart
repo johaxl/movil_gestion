@@ -99,31 +99,50 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
                 TextFormField(
                   controller: cedulaController,
                   keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator: (value) =>
-                      value == null || value.isEmpty ? "Campo requerido" : null,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(10), // 👈 máximo 10
+                  ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Campo requerido";
+                    }
+                    if (value.length != 10) {
+                      return "La cédula debe tener 10 dígitos";
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                     labelText: "Cédula del Usuario",
-                    hintText: "Ingrese la cédula",
+                    hintText: "Ingrese la cédula (10 dígitos)",
                     prefixIcon: const Icon(Icons.badge),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
                   ),
                 ),
-
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 // teléfono
                 TextFormField(
                   controller: telefonoController,
                   keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator: (value) =>
-                      value == null || value.isEmpty ? "Campo requerido" : null,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(10),
+                  ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Campo requerido";
+                    }
+                    if (value.length != 10) {
+                      return "El teléfono debe tener 10 dígitos";
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                     labelText: "Teléfono del Usuario",
-                    hintText: "Ingrese el teléfono",
+                    hintText: "Ingrese el teléfono (10 dígitos)",
                     prefixIcon: const Icon(Icons.phone),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -131,7 +150,7 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 // correo electrónico validado
                 TextFormField(
