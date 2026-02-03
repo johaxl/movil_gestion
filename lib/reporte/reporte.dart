@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../models/prestamos_models.dart';
 import '../repositories/prestamos_repository.dart';
+import '../widgets/app.drawer.dart';
 
 class ReportePrestamosScreen extends StatefulWidget {
   const ReportePrestamosScreen({super.key});
@@ -72,6 +73,8 @@ class _ReportePrestamosScreenState extends State<ReportePrestamosScreen> {
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
+      drawer: AppDrawer(),
+
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(

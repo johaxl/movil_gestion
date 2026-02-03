@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/usuarios_models.dart';
 import '../repositories/usuarios_repository.dart';
+import '../widgets/app.drawer.dart';
 
 class UsuarioScreen extends StatefulWidget {
   const UsuarioScreen({super.key});
@@ -91,6 +92,7 @@ class _UsuarioScreenState extends State<UsuarioScreen> {
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
+      drawer: AppDrawer(),
 
       body: cargando
           ? const Center(child: CircularProgressIndicator())

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/prestamos_models.dart';
 import '../repositories/prestamos_repository.dart';
+import '../widgets/app.drawer.dart';
 
 class PrestamoScreen extends StatefulWidget {
   const PrestamoScreen({super.key});
@@ -101,16 +102,8 @@ class _PrestamoScreenState extends State<PrestamoScreen> {
         backgroundColor: const Color.fromARGB(255, 242, 201, 76),
         foregroundColor: Colors.white,
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.report),
-            tooltip: "Reporte",
-            onPressed: () {
-              Navigator.pushNamed(context, '/reporte');
-            },
-          ),
-        ],
       ),
+      drawer: AppDrawer(),
 
       body: cargando
           ? const Center(child: CircularProgressIndicator())

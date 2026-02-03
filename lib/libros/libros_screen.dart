@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/libros_models.dart';
 import '../repositories/libros_repository.dart';
+import '../widgets/app.drawer.dart';
 
 class LibroScreen extends StatefulWidget {
   const LibroScreen({super.key});
@@ -92,6 +93,7 @@ class _LibroScreenState extends State<LibroScreen> {
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
+      drawer: AppDrawer(),
 
       // cuerpo de la pantalla
       body: cargando

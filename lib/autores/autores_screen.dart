@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/autores_models.dart';
 import '../repositories/autores_repository.dart';
+import '../widgets/app.drawer.dart';
 
 class AutorScreen extends StatefulWidget {
   const AutorScreen({super.key});
@@ -90,6 +91,7 @@ class _AutorScreenState extends State<AutorScreen> {
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
+      drawer: AppDrawer(),
 
       // Muestra un cargador mientras se obtienen los datos
       body: cargando

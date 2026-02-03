@@ -1,263 +1,196 @@
 import 'package:flutter/material.dart';
+import '../widgets/app.drawer.dart';
 
+// Pantalla principal de la aplicación
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-      // esto es para el color de fondo
+      // Color de fondo de toda la pantalla
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: Text("BIBLIOTECA"),
-        backgroundColor: const Color.fromARGB(255, 30, 58, 95),
-        foregroundColor: Colors.white,
-        centerTitle: true,
+        centerTitle: true, // Centra el título
+        elevation: 0, // Quita la sombra del AppBar
+        title: const Text(
+          "BIBLIOTECA",
+          style: TextStyle(
+            fontWeight: FontWeight.bold, // Texto en negrita
+            letterSpacing:
+                1.2, // Separa un poco las letras para que se vea bonito
+          ),
+        ),
+
+        // Fondo con degradado para el AppBar
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 67, 187, 196),
+                Color.fromARGB(255, 30, 120, 130),
+              ],
+              begin: Alignment.topLeft, // Inicio del degradado
+              end: Alignment.bottomRight, // Fin del degradado
+            ),
+          ),
+        ),
+        foregroundColor: Colors.white, // Color del texto
       ),
-      body: Center(
+
+      // Menú lateral
+      drawer: const AppDrawer(),
+      body: SingleChildScrollView(
+        // Permite hacer scroll si el contenido es grande
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            SizedBox(height: 10),
-            Text(
-              "Menú Principal",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            Divider(
-              color: Colors.black,
-              thickness: 2,
-              height: 20,
-            ), // el thickness es para ajustar el grosor
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: SingleChildScrollView(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 150,
-                            width: 150,
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 74, 144, 226),
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Icon(
-                              Icons.person,
-                              size: 100,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 74, 144, 226),
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.person, color: Colors.white),
-                                  SizedBox(width: 10),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pushNamed(context, '/autor');
-                                    },
-                                    child: Text("Autores"),
-                                    style: TextButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+            // =============================
+            // CONTENEDOR DE BIENVENIDA
+            // =============================
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 20),
 
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 150,
-                            width: 150,
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 107, 197, 180),
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Icon(
-                              Icons.book,
-                              size: 100,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 107, 197, 180),
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.book, color: Colors.white),
-                                  SizedBox(width: 10),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pushNamed(context, '/libro');
-                                    },
-                                    child: Text("Libros"),
-                                    style: TextButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+              // Diseño del contenedor (color, bordes y sombra)
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18), // Bordes redondeados
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12, // Sombra suave
+                    blurRadius: 10, // Qué tan difusa es la sombra
+                    offset: Offset(0, 6), // Posición de la sombra
+                  ),
+                ],
+              ),
+
+              // Texto que se muestra dentro del contenedor
+              child: const Text(
+                "Bienvenido a la Biblioteca Digital.\n\n"
+                "Desde aquí podrás administrar libros, autores, usuarios "
+                "y préstamos de manera sencilla y ordenada.",
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              height: 200,
+              margin: const EdgeInsets.only(bottom: 20),
+
+              // Diseño del contenedor de la imagen
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(18), // Bordes redondeados
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12, // Sombra
+                    blurRadius: 10,
+                    offset: Offset(0, 6),
+                  ),
+                ],
+              ),
+
+              // Recorta la imagen para que respete los bordes redondeados
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Image.asset(
+                  "assets/3.jpeg", // Imagen principal
+                  fit: BoxFit.cover, // Ajusta la imagen al contenedor
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 150,
-                          width: 150,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 145, 93, 17),
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Icon(
-                            Icons.people,
-                            size: 100,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 145, 93, 17),
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.people_alt, color: Colors.white),
-                                SizedBox(width: 10),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pushNamed(context, '/usuario');
-                                  },
-                                  child: Text("Usuarios"),
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    foregroundColor: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
 
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 150,
-                          width: 150,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 242, 201, 76),
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Icon(
-                            Icons.auto_stories_rounded,
-                            size: 100,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 242, 201, 76),
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.auto_stories_rounded,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(width: 10),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pushNamed(context, '/prestamo');
-                                  },
-                                  child: Text("Préstamos"),
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    foregroundColor: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            _infoContainer(
+              titulo: "Autores", // Título del contenedor
+              descripcion:
+                  "Permite registrar y administrar los autores "
+                  "de los libros disponibles en la biblioteca.",
+              imagen: "assets/1.jpeg", // Imagen del contenedor
             ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment:
-                    MainAxisAlignment.center, // Centrar verticalmente
-                children: [
-                  Image.asset(
-                    "assets/3.jpeg",
-                    width:
-                        MediaQuery.of(context).size.width *
-                        0.6, //Ajusta el de ancho de la pantalla
-                    fit: BoxFit
-                        .contain, //Hace que se adapte a la pantalla del celular
-                  ),
-                ],
-              ),
+
+            _infoContainer(
+              titulo: "Libros",
+              descripcion:
+                  "Aquí se gestiona el catálogo de libros y "
+                  "su disponibilidad para préstamo.",
+              imagen: "assets/2.jpeg",
+            ),
+
+            _infoContainer(
+              titulo: "Usuarios",
+              descripcion:
+                  "Se controla la información de las personas "
+                  "que pueden solicitar préstamos.",
+              imagen: "assets/4.jpeg",
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // FUNCIÓN PARA CREAR CONTENEDORES CON IMAGEN Y TEXTO
+  Widget _infoContainer({
+    required String titulo, // Texto del título
+    required String descripcion, // Texto descriptivo
+    required String imagen, // Ruta de la imagen
+  }) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 20),
+
+      // Diseño del contenedor
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18), // Bordes redondeados
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12, // Sombra suave
+            blurRadius: 10,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+
+      // Contenido interno del contenedor
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Imagen superior
+          ClipRRect(
+            // Recorta la imagen solo arriba para que quede bonito
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+            child: Image.asset(
+              imagen,
+              height: 160, // Altura de la imagen
+              width: double.infinity,
+              fit: BoxFit.cover, // Ajusta la imagen al ancho
+            ),
+          ),
+
+          // Área del texto
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Título
+                Text(
+                  titulo,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 8), // Espacio entre textos
+                // Descripción
+                Text(descripcion, style: const TextStyle(fontSize: 15)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
