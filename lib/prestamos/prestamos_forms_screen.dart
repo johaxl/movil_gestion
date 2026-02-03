@@ -26,6 +26,7 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
   final fechaDevolucionController = TextEditingController();
 
   String estado = "ACTIVO";
+  int? diasPrestamo; // días seleccionados
 
   PrestamosModels? prestamo;
   bool esEditar = false;
@@ -36,6 +37,8 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
   final librosRepo = LibrosRepository();
   final usuariosRepo = UsuariosRepository();
   final prestamosRepo = PrestamosRepository();
+
+  final List<int> opcionesDias = [3, 7, 10, 15];
 
   @override
   void initState() {
@@ -60,6 +63,16 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
       fechaPrestamoController.text = prestamo!.fechaPrestamo;
       fechaDevolucionController.text = prestamo!.fechaDevolucion;
       estado = prestamo!.estado;
+
+      // Calcular días automáticamente si viene fecha de devolución
+      final fechaPrestamo = DateFormat(
+        'yyyy-MM-dd HH:mm',
+      ).parse(fechaPrestamoController.text);
+      final fechaDevolucion = DateFormat(
+        'yyyy-MM-dd HH:mm',
+      ).parse(fechaDevolucionController.text);
+      final diferencia = fechaDevolucion.difference(fechaPrestamo).inDays;
+      if (opcionesDias.contains(diferencia)) diasPrestamo = diferencia;
     }
 
     cargarDatos();
@@ -85,51 +98,30 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
     if (estado == "DEVUELTO") return;
 
     final hoy = DateTime.now();
+    if (fechaDevolucionController.text.isEmpty) return;
+
     final devolucion = DateFormat(
       'yyyy-MM-dd HH:mm',
     ).parse(fechaDevolucionController.text);
-
     estado = devolucion.isBefore(hoy) ? "ATRASADO" : "ACTIVO";
   }
 
-  Future<void> seleccionarFechaHora() async {
-    final fecha = await showDatePicker(
-      context: context,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-      initialDate: DateTime.now(),
-    );
+  void actualizarFechaDevolucion(int dias) {
+    final fechaPrestamo = DateFormat(
+      'yyyy-MM-dd HH:mm',
+    ).parse(fechaPrestamoController.text);
 
-    if (fecha == null) return;
-
-    final hora = await showTimePicker(
-      context: context,
-      initialTime: const TimeOfDay(hour: 8, minute: 0),
-    );
-
-    if (hora == null) return;
-
-    if (hora.hour < 8 || (hora.hour == 18 && hora.minute > 0)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("La hora debe estar entre 8:00 AM y 6:00 PM"),
-        ),
-      );
-      return;
-    }
-
-    final fechaHora = DateTime(
-      fecha.year,
-      fecha.month,
-      fecha.day,
-      hora.hour,
-      hora.minute,
+    final fechaDevolucion = DateTime(
+      fechaPrestamo.year,
+      fechaPrestamo.month,
+      fechaPrestamo.day + dias,
+      17, // hora fija 17:00
+      0,
     );
 
     fechaDevolucionController.text = DateFormat(
       'yyyy-MM-dd HH:mm',
-    ).format(fechaHora);
-
+    ).format(fechaDevolucion);
     calcularEstado();
     setState(() {});
   }
@@ -149,6 +141,7 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
           key: formPrestamo,
           child: Column(
             children: [
+              // Usuario
               DropdownButtonFormField<int>(
                 value: idUsuario,
                 decoration: InputDecoration(
@@ -170,6 +163,7 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
 
               const SizedBox(height: 10),
 
+              // Libro
               DropdownButtonFormField<int>(
                 value: idLibro,
                 decoration: InputDecoration(
@@ -188,6 +182,7 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
 
               const SizedBox(height: 10),
 
+              // Fecha préstamo
               TextFormField(
                 controller: fechaPrestamoController,
                 readOnly: true,
@@ -202,12 +197,38 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
 
               const SizedBox(height: 10),
 
+              // Selección de días
+              DropdownButtonFormField<int>(
+                value: diasPrestamo,
+                decoration: InputDecoration(
+                  labelText: "Días de préstamo",
+                  prefixIcon: const Icon(Icons.timer),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                items: opcionesDias.map((d) {
+                  return DropdownMenuItem(
+                    value: d,
+                    child: Text("$d días (entrega 17:00)"),
+                  );
+                }).toList(),
+                onChanged: esEditar
+                    ? null
+                    : (v) {
+                        diasPrestamo = v;
+                        actualizarFechaDevolucion(v!);
+                      },
+                validator: (v) =>
+                    v == null ? "Seleccione días de préstamo" : null,
+              ),
+
+              const SizedBox(height: 10),
+
+              // Fecha devolución
               TextFormField(
                 controller: fechaDevolucionController,
                 readOnly: true,
-                onTap: seleccionarFechaHora,
-                validator: (v) =>
-                    v == null || v.isEmpty ? "Seleccione fecha y hora" : null,
                 decoration: InputDecoration(
                   labelText: "Fecha y Hora Devolución",
                   prefixIcon: const Icon(Icons.event),
@@ -219,6 +240,7 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
 
               const SizedBox(height: 10),
 
+              // Estado
               TextFormField(
                 readOnly: true,
                 initialValue: estado,
@@ -233,6 +255,7 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
 
               const SizedBox(height: 15),
 
+              // Botones Guardar / Cancelar
               Row(
                 children: [
                   Expanded(
@@ -280,9 +303,7 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
                       child: Text(esEditar ? "Actualizar" : "Guardar"),
                     ),
                   ),
-
                   const SizedBox(width: 10),
-
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
