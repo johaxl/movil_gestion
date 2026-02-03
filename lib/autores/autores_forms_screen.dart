@@ -153,7 +153,7 @@ class _AutorFormScreenState extends State<AutorFormScreen> {
                       context: context,
                       initialDate: fechaInicial,
                       firstDate: DateTime(1900),
-                      lastDate: DateTime.now(),
+                      lastDate: DateTime(2000),
                     );
 
                     // si selecciona una fecha se asigna
@@ -172,7 +172,7 @@ class _AutorFormScreenState extends State<AutorFormScreen> {
 
                 // menú desplegable del género literario
                 DropdownButtonFormField<String>(
-                  value: generoLiterarioController.text.isEmpty
+                  initialValue: generoLiterarioController.text.isEmpty
                       ? null
                       : generoLiterarioController.text,
                   validator: (value) =>
