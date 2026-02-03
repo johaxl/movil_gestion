@@ -161,27 +161,46 @@ class _LibroFormScreenState extends State<LibroFormScreen> {
                 // año de publicación
                 TextFormField(
                   controller: anioController,
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.number, // teclado numérico
+                  inputFormatters: [
+                    FilteringTextInputFormatter
+                        .digitsOnly, // solo permite números
+                    LengthLimitingTextInputFormatter(
+                      4,
+                    ), // máximo 4 dígitos (ej: 2024)
+                  ],
                   validator: (value) {
+                    // valida que no esté vacío
                     if (value == null || value.isEmpty) {
                       return "Campo requerido";
                     }
 
+                    // convierte el texto a número
                     final anio = int.tryParse(value);
+
+                    // valida que sea un número válido
                     if (anio == null) {
                       return "Solo números";
                     }
 
+                    // año mínimo permitido
+                    if (anio < 1900) {
+                      return "El año debe ser mayor o igual a 1900";
+                    }
+
+                    // obtiene el año actual del sistema
                     final anioActual = DateTime.now().year;
+
+                    // valida que no sea mayor al año actual
                     if (anio > anioActual) {
                       return "No puede ser mayor al año actual";
                     }
 
-                    return null;
+                    return null; // todo correcto
                   },
                   decoration: InputDecoration(
                     labelText: "Año de Publicación",
-                    hintText: "Ingrese el año de publicación",
+                    hintText: "Ejemplo: 2000",
                     prefixIcon: const Icon(Icons.calendar_today),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
