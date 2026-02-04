@@ -22,23 +22,23 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
   final telefonoController = TextEditingController();
   final correoController = TextEditingController();
 
-  // valida si una cédula es ecuatoriana real
-  bool validarCedulaEcuatoriana(String cedula) {
+  bool validarCedula(String cedula) {
     if (cedula.length != 10) return false;
 
-    // obtiene los dos primeros dígitos de provincia
+    // Evita cédulas con todos los dígitos iguales
+    if (RegExp(r'^(\d)\1{9}$').hasMatch(cedula)) return false;
+
+    // provincia
     final provincia = int.parse(cedula.substring(0, 2));
     if (provincia < 1 || provincia > 24) return false;
 
-    // tercer dígito debe ser menor a 6
+    // tercer dígito
     final tercerDigito = int.parse(cedula[2]);
     if (tercerDigito >= 6) return false;
 
-    // coeficientes para el cálculo
     final coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
     int suma = 0;
 
-    // cálculo del dígito verificador
     for (int i = 0; i < 9; i++) {
       int valor = int.parse(cedula[i]) * coeficientes[i];
       if (valor >= 10) valor -= 9;
@@ -137,7 +137,7 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
                     }
 
                     // valida que sea una cédula real de Ecuador xd
-                    if (!validarCedulaEcuatoriana(value)) {
+                    if (!validarCedula(value)) {
                       return "Cédula no válida";
                     }
 

@@ -37,13 +37,7 @@ class AppDrawer extends StatelessWidget {
       "titulo": "Reportes",
       "icono": Icons.report,
       "ruta": "/reporte",
-      "color": Color.fromARGB(255, 156, 40, 10),
-    },
-    {
-      "titulo": "Gracias por usar la app",
-      "icono": Icons.info_outline,
-      "ruta": "/",
-      "color": Color.fromARGB(255, 156, 40, 10),
+      "color": const Color.fromARGB(255, 156, 40, 10),
     },
   ];
 

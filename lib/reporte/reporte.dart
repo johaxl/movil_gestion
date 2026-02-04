@@ -70,7 +70,7 @@ class _ReportePrestamosScreenState extends State<ReportePrestamosScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Reporte de Préstamos"),
-        backgroundColor: Colors.indigo,
+        backgroundColor: const Color.fromARGB(255, 156, 40, 10),
         foregroundColor: Colors.white,
       ),
       drawer: AppDrawer(),
@@ -129,7 +129,7 @@ class _ReportePrestamosScreenState extends State<ReportePrestamosScreen> {
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.indigo,
+                backgroundColor: const Color.fromARGB(255, 156, 40, 10),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 12,
