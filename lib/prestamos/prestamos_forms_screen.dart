@@ -260,6 +260,7 @@ class _PrestamoFormScreenState extends State<PrestamoFormScreen> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
+                      // elevated button sirve para crear un boton con sombra
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,

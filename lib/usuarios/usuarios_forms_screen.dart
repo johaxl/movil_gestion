@@ -74,6 +74,7 @@ class _UsuarioFormScreenState extends State<UsuarioFormScreen> {
     final esEditar = usuario != null;
 
     return Scaffold(
+      // es para editar o insertar
       appBar: AppBar(
         title: Text(esEditar ? "Editar Usuario" : "Insertar Usuario"),
         backgroundColor: const Color.fromARGB(255, 145, 93, 17),
